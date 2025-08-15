@@ -17,17 +17,19 @@ class Component:
         """Component update method to override"""
         print("Component update method")
 
+    def execute(self):
+        """Component execute method to override"""
+        print("Component execute method")
+
 class Clock(Component):
     """
     Clock class
     """
-    def __init__(self, dt:float, t:float=0, t_final:float=None, name:str="default_clock"):
+    def __init__(self, dt:float, name:str="default_clock"):
         super().__init__(name)
         self.dt = dt
-        self.t = t
-        self.t_final = dt
-        if(t_final):
-            self.t_final = t_final
+        self.t = 0
+        self.t_final = 0
         self.running = True
 
     def reset(self, set_t0_time=False):
@@ -36,32 +38,36 @@ class Clock(Component):
             self.t = 0
         self.running = True
 
-    def set(self, t_final:float):
+    def set(self, t_final:float, t:float=None):
         #return super().set()
         self.t_final = t_final
+        if(t):
+            self.t = t
 
     def update(self):
         #return super().update()
-        if(self.t_final and (self.t >= self.t_final)):
+        if(self.t >= self.t_final):
             self.running = False
-            return None
+            return
         self.t += self.dt
 
 class DataComponent(Component):
     """
     DataComponent class
     """
-    def __init__(self, name = "default_physical_component"):
+    def __init__(self, name = "default_data_component"):
         super().__init__(name)
+        self.simulation_data = []
 
     def simulate(self, clock:Clock):
         """DataComponent simulate method to override"""
+        self.simulation_data.append(clock.t)
         print("DataComponent simulate method")  
 
-    def input_port(self, args=None):
+    def input_port(self):
         """DataComponent input port method to override"""
         print("DataComponent input method")   
 
-    def output_port(self, args=None):
+    def output_port(self):
         """DataComponent output port method to override"""
         print("DataComponent output method")
