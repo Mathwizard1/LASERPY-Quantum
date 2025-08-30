@@ -1,4 +1,4 @@
-from LaserPy.Components import Clock
+from LaserPy import Clock
 
 clock = Clock(dt=0.1, name="my_clock")
 clock.set(t_final=1.0)
