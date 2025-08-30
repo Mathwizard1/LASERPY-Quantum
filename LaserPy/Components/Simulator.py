@@ -1,7 +1,7 @@
 from typing import Union, Tuple
 
-from LaserPy.Components.Component import Component
-from LaserPy.Components.Clock import Clock
+from .Components.Component import Component
+from .Components.Clock import Clock
 
 class Connection(Component):
     """
