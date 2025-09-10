@@ -28,8 +28,6 @@ class SpecificConstants:
     Specific Constants for LaserPy
     """
 
-    __instance = None
-
     TAU_N = 0.74 * (1.0e-9)
     """ 
     Carrier lifetime (seconds) 
@@ -41,3 +39,6 @@ class SpecificConstants:
     """
 
 ERR_TOLERANCE = 1.0e-12
+
+FIG_WIDTH = 12
+FIG_HEIGHT = 6
