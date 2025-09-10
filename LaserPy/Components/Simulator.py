@@ -77,9 +77,13 @@ class Simulator(DataComponent):
         plt.show()
 
     def get_data(self):
-        """Simulator display_data method"""
+        """Simulator get_data method"""
         #return super().get_data()
         return np.array(self.simulation_data)
+
+    def reset(self):
+        #return super().reset()
+        pass
 
     def set(self, connections:Connection|tuple[Connection,...]):
         """Simulator set method"""
