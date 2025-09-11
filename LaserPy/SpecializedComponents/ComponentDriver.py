@@ -1,0 +1,71 @@
+from ..Components import Clock
+from ..Components import TimeComponent
+
+from ..Components import ArbitaryWave
+from ..Components import ArbitaryWaveGenerator
+
+class CurrentDriver(TimeComponent):
+    """ 
+    Current Driver class
+    """
+    def __init__(self, AWG:ArbitaryWaveGenerator, name:str="default_current_driver"):
+        super().__init__(name)
+        self.current = 0
+        """current data for CurrentDriver"""
+
+        self._AWG = AWG
+        """ArbitaryWaveGenerator for CurrentDriver"""
+
+        self._modulation_OFF:tuple[str,...] = ()
+        """Modulation_OFF ArbitaryWaves Tuple for CurrentDriver"""
+
+        self._modulation_ON:tuple[str,...] = ()
+        """Modulation_ON ArbitaryWaves Tuple for CurrentDriver"""
+
+        self._modulation_function = None
+        """Modulation_function for CurrentDriver"""
+
+    def reset(self):
+        """CurrentDriver reset method"""
+        #return super().reset()
+        self._modulation_OFF = ()
+        self._modulation_ON = ()
+        self._modulation_function = None
+
+        self.current = 0
+
+    def set(self,modulation_OFF:tuple[ArbitaryWave,...], modulation_ON:tuple[ArbitaryWave,...]|None=None, modulation_function:ArbitaryWave|None=None):
+        """CurrentDriver set method"""
+        #return super().set()
+        modulation = []
+        for arbitarywaves in modulation_OFF:
+            if(arbitarywaves.name not in self._AWG.signals):
+                print(f"{arbitarywaves.name} not in AWG, Signal skipped.")
+                continue
+            modulation.append(arbitarywaves.name)
+
+        self._modulation_OFF = tuple(modulation)
+        #print(self._modulation_OFF)
+
+        if(modulation_ON):
+            modulation = []
+            for arbitarywaves in modulation_ON:
+                if(arbitarywaves.name not in self._AWG.signals):
+                    print(f"{arbitarywaves.name} not in AWG, Signal skipped.")
+                    continue
+                modulation.append(arbitarywaves.name)
+
+            self._modulation_ON = tuple(modulation)
+            #print(self._modulation_ON)
+
+        self._modulation_function = modulation_function
+
+    def simulate(self, clock: Clock):
+        """CurrentDriver simulate method"""
+        #return super().simulate(clock)
+        if(self._modulation_function and self._modulation_function(clock.t)):
+            # Modulation function is set and Modulation_ON
+            self.current = self._AWG.simulate(clock, self._modulation_ON)
+            return self.current
+        self.current = self._AWG.simulate(clock, self._modulation_OFF)
+        return self.current
