@@ -2,6 +2,8 @@
 
 from enum import Enum
 
+import json
+
 # fixed Scientific Constants
 class UniversalConstants(Enum):
     """
@@ -23,20 +25,34 @@ class UniversalConstants(Enum):
     Speed of light in vacuum 
     """
 
-class SpecificConstants:
+class LaserPyConstants:
     """
-    Specific Constants for LaserPy
+    Simulation Constants for LaserPy
     """
+    _Constants = {}
 
-    TAU_N = 0.74 * (1.0e-9)
-    """ 
-    Carrier lifetime (seconds) 
-    """
+    @classmethod
+    def load_from_json(cls, filepath='./LaserPy/Constants.json'):
+        """Loads constants from a JSON file."""
+        try:
+            with open(filepath, 'r') as f:
+                cls._Constants = json.load(f)
+        except FileNotFoundError:
+            print(f"Error: The file '{filepath}' was not found.")
+            exit()
 
-    TAU_P = 0.74 * (1.0e-12)
-    """ 
-    Photon lifetime (seconds) 
-    """
+    @classmethod
+    def get(cls, key, default=None):
+        """Retrieves a constant value by key."""
+        return cls._Constants.get(key, default)
+
+    @classmethod
+    def set(cls, key, value):
+        """Allows for runtime modification of a constant."""
+        cls._Constants[key] = value
+
+# Load the constants at the runtime
+LaserPyConstants.load_from_json()
 
 ERR_TOLERANCE = 1.0e-12
 

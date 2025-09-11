@@ -1,0 +1,20 @@
+{
+    "TAU_N": 7.4e-10,
+    "TAU_P": 7.4e-13,
+
+    "g": 1.27e-12,
+    "Epsilon": 1.18e-23,
+  
+    "N_transparent": 0.85e+24,
+
+    "Beta": 0.5e-5,
+    "Alpha": 2.7,
+    "Eta": 0.2,
+
+    "Laser_Vol": 1.72e-17,
+
+    "Gamma_cap": 0.27,
+    "Kappa": 1.13e+11,
+
+    "~":0
+}
