@@ -27,6 +27,15 @@ class Component:
         # Empty method
         pass
 
+    def input_port(self):
+        """Component input_port method to override"""  
+        kwargs = {}
+        return kwargs
+
+    def output_port(self, kwargs:dict={}):
+        """Component output_port method to override"""  
+        return kwargs
+
 class Clock(Component):
     """
     Clock class
@@ -35,30 +44,38 @@ class Clock(Component):
         super().__init__(name)
         self.dt = dt
         self.t = 0
-        self.t_final = 0
         self.running = True
 
+        self._t_final = 0
+
     def reset(self, set_t0_time:bool=False):
-        """Clock reset method to override"""
+        """Clock reset method"""
         #return super().reset()
         if(set_t0_time):
             self.t = 0
         self.running = True
 
     def set(self, t_final:float, t:float|None=None):
-        """Clock set method to override"""
+        """Clock set method"""
         #return super().set()
-        self.t_final = t_final
+        self._t_final = t_final
         if(t):
             self.t = t
 
     def update(self):
-        """Clock update method to override"""
+        """Clock update method"""
         #return super().update()
-        if(self.t >= self.t_final):
+        if(self.t >= self._t_final):
+            print(f"{np.format_float_scientific(self._t_final, precision= 3, exp_digits= 3)} sec has elapsed.")
             self.running = False
             return
         self.t += self.dt
+
+    def output_port(self, kwargs: dict = {}):
+        """Clock output_port method"""
+        #return super().output_port(kwargs)
+        kwargs['clock'] = self
+        return kwargs
 
 class TimeComponent(Component):
     """
@@ -68,9 +85,15 @@ class TimeComponent(Component):
         super().__init__(name)
 
     def simulate(self, clock:Clock):
-        #return super().simulate(args)
         """TimeComponent simulate method to override"""
+        #return super().simulate(args)
         print("TimeComponent simulate method")
+
+    def input_port(self):
+        """TimeComponent input_port method to override"""
+        #return super().input_port()
+        kwargs = {'clock':None}
+        return kwargs
 
 class DataComponent(Component):
     """
@@ -78,65 +101,41 @@ class DataComponent(Component):
     """
     def __init__(self, save_simulation:bool=False, name:str="default_data_component"):
         super().__init__(name)
-        self.save_simulation = save_simulation
-        self.simulation_data = None
+        self._save_simulation = save_simulation
+
+        self._simulation_data = {}
+        self._simulation_data_units = {}
 
     def store_data(self):
-        """DataComponent store_data method to override"""
-        print("DataComponent store_data method")
-
-    def reset_data(self):
-        """DataComponent reset_data method to override"""
-        print("DataComponent reset_data method")
-
-    def display_data(self):
-        """DataComponent display_data method to override"""
-        print("DataComponent display_data method")
-
-    def get_data(self):
-        """DataComponent get_data method to override"""
-        print("DataComponent get_data method")
-
-class PhysicalComponent(DataComponent, TimeComponent):
-    """
-    PhysicalComponent class
-    """
-    def __init__(self, save_simulation:bool=False, name:str="default_physical_component"):
-        super().__init__(save_simulation, name)  
-        self.data = -1
-        self.simulation_data = {'data':[]}
-        self.simulation_data_units = {'data':r" ($u$)"}
-
-    def store_data(self):
-        """PhysicalComponent store_data method to override"""
-        #return super().store_data()
-        for key in self.simulation_data:
+        """DataComponent store_data method"""
+        for key in self._simulation_data:
             if hasattr(self, key):
-                self.simulation_data[key].append(getattr(self, key))
+                self._simulation_data[key].append(getattr(self, key))
 
     def reset_data(self):
-        """PhysicalComponent reset_data method to override"""
-        #return super().reset_data()
-        for key in self.simulation_data:
-            self.simulation_data[key].clear()
+        """DataComponent reset_data method"""
+        for key in self._simulation_data:
+            self._simulation_data[key].clear()
 
-    def display_data(self, time_data:np.ndarray):
-        """PhysicalComponent display_data method to override"""
-        #return super().display_data()
-        if(not self.save_simulation):
-            print(f"{self.name} did not save simulation data\n")
+    def display_data(self, time_data:np.ndarray|None):
+        """DataComponent display_data method"""
+        if(not self._save_simulation):
+            print(f"{self.name} did not save simulation data")
+            return
+        elif(time_data is None):
+            print(f"{self.name} got None for time_data")
             return
         
         plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
 
-        max_hf_plots = 1 + (len(self.simulation_data_units) // 2)
+        max_hf_plots = 1 + (len(self._simulation_data_units) // 2)
         sub_plot_idx = 1
-        for key in self.simulation_data:
+        for key in self._simulation_data:
             plt.subplot(max_hf_plots, 2, sub_plot_idx)
-            plt.plot(time_data, np.array(self.simulation_data[key]), label=f"{key}")
+            plt.plot(time_data, np.array(self._simulation_data[key]), label=f"{key}")
 
             plt.xlabel(r"Time $(s)$")
-            plt.ylabel(key.capitalize() + self.simulation_data_units[key])
+            plt.ylabel(key.capitalize() + self._simulation_data_units[key])
             
             plt.grid()
             plt.legend()
@@ -145,16 +144,26 @@ class PhysicalComponent(DataComponent, TimeComponent):
         plt.show()
 
     def get_data(self):
-        """PhysicalComponent get_data method to override"""
-        #return super().get_data()
-        if(not self.save_simulation):
-            print(f"{self.name} did not save simulation data\n")
+        """DataComponent get_data method"""
+        if(not self._save_simulation):
+            print(f"{self.name} did not save simulation dat")
             return
         
         data_dict = {}
-        for key in self.simulation_data:
-            data_dict[key] = np.array(self.simulation_data[key])
+        for key in self._simulation_data:
+            data_dict[key] = np.array(self._simulation_data[key])
         return data_dict
+
+class PhysicalComponent(DataComponent, TimeComponent):
+    """
+    PhysicalComponent class
+    """
+    def __init__(self, save_simulation:bool=False, name:str="default_physical_component"):
+        super().__init__(save_simulation, name)  
+
+        self._simulation_data = {'data':[]}
+        self._simulation_data_units = {'data':r" $(u)$"}
+        self.data = -1
 
     def simulate(self, clock: Clock, data=None):
         """PhysicalComponent simulate method to override"""
@@ -164,18 +173,18 @@ class PhysicalComponent(DataComponent, TimeComponent):
         else:
             self.data = 100 * np.exp(-clock.t)
 
-        if(self.save_simulation):
+        if(self._save_simulation):
             self.store_data()
 
     def input_port(self):
         """PhysicalComponent input port method to override"""
-        #print("PhysicalComponent input method")   
+        #return super().input_port() 
         kwargs = {'clock':None, 'data':None}
         return kwargs
 
     def output_port(self, kwargs:dict={}):
         """PhysicalComponent output port method to override"""
-        #print("PhysicalComponent output method")
+        #return super().output_port(kwargs)
         for key in kwargs:
             if hasattr(self, key):
                 kwargs[key] = getattr(self, key)
