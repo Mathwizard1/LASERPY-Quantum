@@ -11,3 +11,4 @@ from .Components import Connection
 from .Components import Simulator
 
 from .SpecializedComponents import CurrentDriver
+from .SpecializedComponents import Laser

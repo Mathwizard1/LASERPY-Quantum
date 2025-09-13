@@ -5,7 +5,7 @@ from enum import Enum
 import json
 
 # fixed Scientific Constants
-class UniversalConstants(Enum):
+class UniversalConstants(float, Enum):
     """
     Universal Constants for LaserPy
     """
@@ -29,7 +29,7 @@ class LaserPyConstants:
     """
     Simulation Constants for LaserPy
     """
-    _Constants = {}
+    _Constants: dict[str, float] = {}
 
     @classmethod
     def load_from_json(cls, filepath='./LaserPy/Constants.json'):
@@ -42,7 +42,7 @@ class LaserPyConstants:
             exit()
 
     @classmethod
-    def get(cls, key, default=None):
+    def get(cls, key, default=1.0):
         """Retrieves a constant value by key."""
         return cls._Constants.get(key, default)
 

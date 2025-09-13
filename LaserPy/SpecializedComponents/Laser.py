@@ -1,118 +1,145 @@
-import matplotlib.pyplot as plt
+from __future__ import annotations
+
 import numpy as np
 
+from ..Components import Clock
 from ..Components import PhysicalComponent
+
+from ..Components.Signal import NoNoise
 
 from ..Constants import UniversalConstants
 from ..Constants import LaserPyConstants
-from ..Constants import ERR_TOLERANCE, FIG_WIDTH, FIG_HEIGHT
+from ..Constants import ERR_TOLERANCE
 
 class Laser(PhysicalComponent):
     """
     Laser class for simulations
     """
-    def __init__(self, save_simulation: bool = False, name: str = "default_physical_component"):
+
+    # Class variables for Laser
+    _TAU_N = LaserPyConstants.get('Tau_N')
+    _TAU_P = LaserPyConstants.get('Tau_P')
+
+    _g = LaserPyConstants.get('g')
+    _Epsilon = LaserPyConstants.get('Epsilon')
+  
+    _N_transparent = LaserPyConstants.get('N_transparent')
+
+    _Beta = LaserPyConstants.get('Beta')
+    _Alpha = LaserPyConstants.get('Alpha')
+    _Eta = LaserPyConstants.get('Eta')
+
+    _Laser_Vol = LaserPyConstants.get('Laser_Vol')
+
+    _Gamma_cap = LaserPyConstants.get('Gamma_cap')
+    _Kappa = LaserPyConstants.get('Kappa')
+
+    def __init__(self, laser_wavelength:float = 1550.0e-9, save_simulation: bool = False, name: str = "default_laser_component"):
         super().__init__(save_simulation, name)
-        self.photon = ERR_TOLERANCE
+        self.photon: float = ERR_TOLERANCE
         """photon data for Laser"""
 
-        self.carrier = LaserPyConstants.get('N_transparent')
+        self.carrier: float = self._N_transparent
         """carrier data for Laser"""
 
-        self.electric_field = ERR_TOLERANCE
+        self.electric_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
         """electric_field data for Laser"""
 
-        self._simulation_data = {'current':[], 'photon':[], 'carrier':[], 'electric_field':[], 'phase':[]}
-        self._simulation_data_units = {'current':r" $()$", 'photon':r" $()$", 
-                                       'carrier':r" $()$", 'electric_field':r" $()$"}
-
-        self._phase = ERR_TOLERANCE
+        self.phase: float = ERR_TOLERANCE
         """phase data for Laser"""
 
-        self._Dphase = ERR_TOLERANCE
-        """Delta phase data for Laser"""
+        self.current: float = ERR_TOLERANCE
+        """current data for Laser"""
+
+        self._simulation_data = {'current':[], 'photon':[], 'carrier':[], 'phase':[]}
+        self._simulation_data_units = {'current':r" $()$", 'photon':r" $()$", 
+                                       'carrier':r" $()$", 'phase':r" $()$"}
+
+        # Laser class private data
+        self._free_running_freq = UniversalConstants.C.value / laser_wavelength
+        """free running frequency data for Laser"""
+
+        # Noise classes for simulations
+        self._Fn_t = NoNoise('carrier_NoNoise')
+        self._Fs_t = NoNoise('photon_NoNoise')
+        self._Fphi_t = NoNoise('phase_NoNoise')
+
+        # Optical Injection locking data
+        self._slave_locked = False
+        self._master_freq_detuning: float|None = None
+
+    def _dN_dt(self):
+        """Delta number of carrier method"""
+        dN_dt = self.current / (UniversalConstants.CHARGE.value * self._Laser_Vol) - self.carrier / self._TAU_N - self._g * ((self.carrier - self._N_transparent) / (1 + self._Epsilon * self.photon)) * self.photon + self._Fn_t()
+        return dN_dt
+
+    def _dS_dt(self):
+        """Delta number of photon method"""
+        dS_dt = self._Gamma_cap * self._g * ((self.carrier - self._N_transparent) / (1 + self._Epsilon * self.photon)) * self.photon - self.photon / self._TAU_P + self._Gamma_cap * self._Beta * self.carrier / self._TAU_N + self._Fs_t()
+        return dS_dt
+
+    def _dPhi_dt(self):
+        """Delta phase method"""
+        dPhi_dt = self._Alpha / 2 * (self._Gamma_cap * self._g * (self.carrier - self._N_transparent) - 1 / self._TAU_P) + self._Fphi_t()
+        return dPhi_dt
 
     def reset(self):
         """Laser reset method"""
         #return super().reset()
+        self.current = ERR_TOLERANCE
         self.photon = ERR_TOLERANCE
-        self.carrier = LaserPyConstants.get('N_transparent')
-        self.electric_field = ERR_TOLERANCE
+        self.carrier = self._N_transparent
+        self.electric_field = ERR_TOLERANCE * np.exp(1j * 0)
+        self.phase = ERR_TOLERANCE
 
-        self._phase = ERR_TOLERANCE
-        self._Dphase = ERR_TOLERANCE
+        # Remove masters
+        self._slave_locked = False
+        self._master_freq_detuning = None
 
-###############################################################################
-class L:
-    def values(self):
-        """
-        Physical constraint check and get simulation values
-        """
-        self.N_t = max(err_fault, self.N_t)
-        self.S_t = max(err_fault, self.S_t)
+    def set_Noise(self, Fn_t:NoNoise, Fs_t:NoNoise, Fphi_t:NoNoise):
+        """Laser set noise method""" 
+        self._Fn_t = Fn_t
+        self._Fs_t = Fs_t
+        self._Fphi_t = Fphi_t
 
-        # Phase and Photons gives Optical field
-        self.E_t = np.sqrt(Power(self.S_t, self.fr_freq)) * np.exp2(1j * self.Phi_t)
+    def set_master_Laser(self, master_Laser:Laser):
+        """Laser set master laser method""" 
+        self._slave_locked = True
+        self._master_freq_detuning = self._free_running_freq - master_Laser._free_running_freq
 
-        return (self.N_t, self.S_t, self.Phi_t, self.E_t)
+    def simulate(self, clock: Clock, current: float, injection_field = None):
+        """Laser simulate method"""
+        #return super().simulate(clock, data)
 
-    def dN_dt(self, I_t, Fn_t):
-        """
-        delta Number of Carriers
-        """
-        val = I_t / (universalConstants.charge.value * Vol) - self.N_t / Tau_n - g * ((self.N_t - self.N0) / (1.0 + Epsilon * self.S_t)) * self.S_t + Fn_t
-        return val
+        # Save current in its variable
+        self.current = current
 
-    def dS_dt(self, Fs_t):
-        """
-        delta Photon density
-        """
-        val = Gamma_cap * g * ((self.N_t - self.N0) / (1.0 + Epsilon * self.S_t)) * self.S_t - self.S_t / Tau_p + Gamma_cap * Beta * self.N_t / Tau_n + Fs_t
-        return val
+        # Base Laser rate equations
+        dN_dt = self._dN_dt()
+        dS_dt = self._dS_dt()
+        dPhi_dt = self._dPhi_dt()
 
-    def dPhi_dt(self, Fphi_t):
-        """
-        delta Optical phase
-        """
-        val = (Alpha / 2.0) * (Gamma_cap * g * (self.N_t - self.N0) - 1.0 / Tau_p) + Fphi_t
-        return val
-    
-class SlaveLaser(Laser):
-    """
-    Slave Laser class\n
-    Parent: Laser class
-    """
-    def __init__(self, name, fr_freq=0, N0=N_transparent, S0= err_fault, Phi0= err_fault):
-        super().__init__(name, fr_freq, N0, S0, Phi0)
-        
-        self.master_laser = None
-        """ injection Master laser """
+        # Injection_field equations
+        if(self._slave_locked):
+            print("Laser slave locked not implemented")
 
-    def set_master_laser(self, master_laser: Laser):
-        """
-        Set stabilised master laser
-        """
-        self.master_laser = master_laser
-        
-        self.Delta_Winj = self.fr_freq - master_laser.fr_freq
-        """ frequency detuning """
+        # Time step update
+        self.carrier += dN_dt * clock.dt
+        self.photon += dS_dt * clock.dt
+        self.phase += dPhi_dt * clock.dt
 
-    def update(self, I_t, t, dt= 1e-3, Fn_t= 0.0, Fs_t= 0.0, Fphi_t= 0.0):
-        """
-        Update N, S, phi for slave laser and return current value
-        """
-        # Optical Injection Lock Terms
-        if(self.master_laser is not None):
-            Delta_phi = self.Phi_t - self.master_laser.Phi_t - self.Delta_Winj * t
+        # Value corrections
+        self.carrier = max(self.carrier, ERR_TOLERANCE)
+        self.photon = max(self.photon, ERR_TOLERANCE)
 
-            temp_N_t = self.N_t + self.dN_dt(I_t, Fn_t) * dt 
-            temp_S_t = self.S_t + (self.dS_dt(Fs_t) + 2 * Kappa * np.sqrt(self.master_laser.S_t * self.S_t) * np.cos(Delta_phi)) * dt
-            self.dPhi = (self.dPhi_dt(Fphi_t) - Kappa * np.sqrt(self.master_laser.S_t / self.S_t) * np.sin(Delta_phi)) * dt
-        
-            """ time step update """ 
-            self.N_t = temp_N_t
-            self.S_t = temp_S_t
-            self.Phi_t += self.dPhi
-        else:
-            return super().update(I_t, t, dt, Fn_t, Fs_t, Fphi_t)
-        return self.values()
+        # Optical field
+        self.electric_field = np.sqrt(self.photon) * np.exp(1j * self.phase)
+
+        if(self._save_simulation):
+            self.store_data()
+
+    def input_port(self):
+        """Laser input port method""" 
+        #return super().input_port()
+        kwargs = {'clock':None, 'current':None, 'injection_field':None}
+        return kwargs
