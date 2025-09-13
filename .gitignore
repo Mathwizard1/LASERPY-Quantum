@@ -1,3 +1,4 @@
 LaserPy/__pycache__/*
-LaserPy/Components/*
-LaserPy/SpecialisedComponents/*
+LaserPy/Components/__pycache__/*
+LaserPy/SpecializedComponents/__pycache__/*
+laser dynamics and optical injection lock.pdf
