@@ -2,12 +2,23 @@ import numpy as np
 
 from .Component import Clock
 
-class LangevinNoise:
+class NoNoise:
+    """
+    NoNoise class
+    """
+    def __init__(self, noise_name:str="default_no_noise"):
+        self.noise_name = noise_name
+
+    def __call__(self):
+        """NoNoise __call__ method to override"""
+        return 0
+
+class LangevinNoise(NoNoise):
     """
     LangevinNoise class
     """
-    def __init__(self, Mu:float=0, Std_dev:float=0, noise_name:str="default_langevin_noise"):
-        self.noise_name = noise_name
+    def __init__(self, Mu: int, Std_dev: int, noise_name: str = "default_langevin_noise"):
+        super().__init__(noise_name)
 
         self._Mu = Mu
         self._Std_dev = Std_dev
