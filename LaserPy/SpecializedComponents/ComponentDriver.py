@@ -6,7 +6,7 @@ from ..Components import ArbitaryWaveGenerator
 
 class CurrentDriver(TimeComponent):
     """ 
-    Current Driver class
+    CurrentDriver class
     """
     def __init__(self, AWG:ArbitaryWaveGenerator, name:str="default_current_driver"):
         super().__init__(name)
@@ -35,10 +35,15 @@ class CurrentDriver(TimeComponent):
 
         self._data = 0.0
 
-    def set(self,modulation_OFF:tuple[ArbitaryWave,...], modulation_ON:tuple[ArbitaryWave,...]|None=None, modulation_function:ArbitaryWave|None=None):
+    def set(self,modulation_OFF:ArbitaryWave|tuple[ArbitaryWave,...], modulation_ON:ArbitaryWave|tuple[ArbitaryWave,...]|None=None, modulation_function: ArbitaryWave|None=None):
         """CurrentDriver set method"""
         #return super().set()
         modulation = []
+        # For direct instance to tuple
+        if(isinstance(modulation_OFF, ArbitaryWave)):
+            modulation_OFF = (modulation_OFF,)
+        
+        # Add signal to AWG
         for arbitarywaves in modulation_OFF:
             if(arbitarywaves.name not in self._AWG.signals):
                 print(f"{arbitarywaves.name} not in AWG, Signal skipped.")
@@ -50,6 +55,11 @@ class CurrentDriver(TimeComponent):
 
         if(modulation_ON):
             modulation = []
+            # For direct instance to tuple
+            if(isinstance(modulation_ON, ArbitaryWave)):
+                modulation_ON = (modulation_ON,)
+            
+            # Add signal to AWG
             for arbitarywaves in modulation_ON:
                 if(arbitarywaves.name not in self._AWG.signals):
                     print(f"{arbitarywaves.name} not in AWG, Signal skipped.")
