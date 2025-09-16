@@ -79,4 +79,3 @@ class ArbitaryWaveGenerator:
             for signal_key in signal_keys:
                 superimposed_signal += self.signals[signal_key](clock.t, args)
             return superimposed_signal
-        return 0

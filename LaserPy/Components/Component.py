@@ -11,6 +11,10 @@ class Component:
         self.name = name
         """Component name data"""
 
+    def __repr__(self) -> str:
+        """Component __repr__ method to override"""
+        return f"Component: {self.name}"
+
     def reset(self):
         """Component reset method to override"""
         print("Component reset method")
