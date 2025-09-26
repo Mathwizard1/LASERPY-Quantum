@@ -12,3 +12,5 @@ from .Components import Simulator
 
 from .SpecializedComponents import CurrentDriver
 from .SpecializedComponents import Laser
+
+__version__ = '0.0.0'

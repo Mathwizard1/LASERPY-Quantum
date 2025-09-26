@@ -93,7 +93,10 @@ current_driver2.set(sBase)
 master_laser = Laser(save_simulation= True, name= "master_laser")
 slave_laser = Laser(save_simulation= True, name= "slave_laser")
 
-SPD = SinglePhotonDetector(target_phase= np.pi / 2, save_simulation= True)
+PS = PhaseSample(np.pi / 2)
+
+SPD1 = SinglePhotonDetector(target_phase= np.pi / 2, save_simulation= True)
+SPD2 = SinglePhotonDetector(target_phase= np.pi / 2, save_simulation= True)
 
 simulator_clock = Clock(dt)
 simulator_clock.set(t_unit * 5)
@@ -104,14 +107,15 @@ simulator.set((
     Connection(simulator_clock, (current_driver1, current_driver2)),
     Connection(current_driver1, master_laser),
     Connection((current_driver2, master_laser), slave_laser),
-    Connection(slave_laser, SPD),
+    Connection(slave_laser, (PS, SPD1)),
+    Connection(PS, SPD2)
 ))
 
 simulator.simulate()
-time_data = simulator.get_data()
+#time_data = simulator.get_data()
 
-master_laser.display_data(time_data)
-slave_laser.display_data(time_data)
+#master_laser.display_data(time_data)
+#slave_laser.display_data(time_data)
 
 simulator_clock.set(t_final)
 simulator_clock.reset()
@@ -121,7 +125,8 @@ slave_laser.set_master_Laser(master_laser)
 simulator.simulate()
 time_data = simulator.get_data()
 
-master_laser.display_data(time_data)
-slave_laser.display_data(time_data)
+#master_laser.display_data(time_data)
+#slave_laser.display_data(time_data)
 
-SPD.display_data(time_data)
+SPD1.display_data(time_data)
+SPD2.display_data(time_data)
