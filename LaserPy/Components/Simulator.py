@@ -47,10 +47,11 @@ class Simulator(DataComponent):
     """
     Simulator class
     """
-    def __init__(self, simulation_clock:Clock, save_simulation:bool=True, name:str="default_simulator"):
-        super().__init__(save_simulation, name)
+    def __init__(self, simulation_clock:Clock, name:str="default_simulator"):
+        super().__init__(True, name)
         self.simulation_clock = simulation_clock
 
+        # Data storage
         self._simulation_data = []
         self._simulation_data_units = r" $(s)$"
 
@@ -64,13 +65,11 @@ class Simulator(DataComponent):
         #return super().reset_data()
         self._simulation_data.clear()
 
+        # TODO propagate clear data to all connection components
+
     def display_data(self):
         """Simulator display_data method"""
         #return super().display_data()
-        if(not self._save_simulation):
-            print(f"{self.name} did not save simulation data")
-            return
-
         plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
 
         time_data = np.array(self._simulation_data)
@@ -86,10 +85,6 @@ class Simulator(DataComponent):
     def get_data(self):
         """Simulator get_data method"""
         #return super().get_data()
-        if(not self._save_simulation):
-            print(f"{self.name} did not save simulation data")
-            return
-
         return np.array(self._simulation_data)
 
     def set(self, connections:Connection|tuple[Connection,...]):
@@ -106,7 +101,6 @@ class Simulator(DataComponent):
             for connection in self._connections:
                     connection.simulate(self.simulation_clock)
             
-            if(self._save_simulation): 
-                self.store_data()
+            self.store_data()
             self.simulation_clock.update()
         print("Simulations Complete")

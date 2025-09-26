@@ -51,18 +51,20 @@ class Laser(PhysicalComponent):
         self.carrier: float = self._N_transparent
         """carrier data for Laser"""
 
-        self.electric_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
-        """electric_field data for Laser"""
-
         self.phase: float = ERR_TOLERANCE
         """phase data for Laser"""
 
         self.current: float = ERR_TOLERANCE
         """current data for Laser"""
 
-        self._simulation_data = {'current':[], 'photon':[], 'carrier':[], 'phase':[]}
-        self._simulation_data_units = {'current':r" $()$", 'photon':r" $()$", 
-                                       'carrier':r" $()$", 'phase':r" $()$"}
+        # Data storage
+        if(save_simulation):
+            self._simulation_data = {'current':[], 'photon':[], 'carrier':[], 'phase':[]}
+            self._simulation_data_units = {'current':r" $(Amp)$", 'photon':r" $(m^{-3})$",
+                                           'carrier':r" $(m^{-3})$", 'phase':r" $(rad)$"}
+
+        self._data: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
+        """electric_field data for Laser"""
 
         # Laser class private data
         self._free_running_freq = UniversalConstants.C.value / laser_wavelength
@@ -98,12 +100,17 @@ class Laser(PhysicalComponent):
         self.current = ERR_TOLERANCE
         self.photon = ERR_TOLERANCE
         self.carrier = self._N_transparent
-        self.electric_field = ERR_TOLERANCE * np.exp(1j * 0)
+        self._data = ERR_TOLERANCE * np.exp(1j * 0)
         self.phase = ERR_TOLERANCE
 
         # Remove masters
         self._slave_locked = False
         self._master_freq_detuning = 0
+
+    def set(self):
+        """Laser set method"""
+        #return super().set()
+        pass
 
     def set_Noise(self, Fn_t:NoNoise, Fs_t:NoNoise, Fphi_t:NoNoise):
         """Laser set noise method""" 
@@ -147,7 +154,8 @@ class Laser(PhysicalComponent):
         self.photon = max(self.photon, ERR_TOLERANCE)
 
         # Optical field
-        self.electric_field = np.sqrt(self.photon) * np.exp(1j * self.phase)
+        # TODO correct it
+        self._data = np.sqrt(self.photon) * np.exp(1j * self.phase)
 
         if(self._save_simulation):
             self.store_data()
@@ -163,6 +171,6 @@ class Laser(PhysicalComponent):
         #return super().output_port(kwargs)
         if('injection_field' in kwargs):
             kwargs['injection_field'] = {'photon': self.photon, 'phase': self.phase}
-        else:
-            kwargs['electric_field'] = self.electric_field
+        elif('electric_field' in kwargs):
+            kwargs['electric_field'] = self._data
         return kwargs
