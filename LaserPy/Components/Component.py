@@ -164,6 +164,7 @@ class DataComponent(Component):
             plt.legend()
             sub_plot_idx += 1
 
+        plt.tight_layout()
         plt.show()
 
     def get_data(self):
