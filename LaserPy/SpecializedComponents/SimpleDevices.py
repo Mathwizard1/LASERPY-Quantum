@@ -102,9 +102,9 @@ class SinglePhotonDetector(DataComponent):
         E_magnitude = np.abs(electric_field)
         E_angle = np.angle(electric_field)
 
-        self.clicked = int(np.abs(E_angle - self._target_phase) <= self._phase_tolerance)
         self.intensity = max(np.square(E_magnitude) * np.cos(E_angle - self._target_phase), 0.0)
 
+        # TODO implement clicked
         # TODO implement photon count
 
         if(self._save_simulation):

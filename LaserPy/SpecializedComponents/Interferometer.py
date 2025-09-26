@@ -1,6 +1,86 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from ..Components import TimeComponent
+
+from .SimpleDevices import PhaseSample
+from .SimpleDevices import SinglePhotonDetector
+
+
+class AsymmetricMachZehnder(TimeComponent):
+    """
+    AMZI component for time-bin encoding with your Laser.electric_field
+    """
+    def __init__(self, path_difference: float = 5e-9, splitting_ratio: float = 0.5,
+                 insertion_loss_db: float = 3.0, name: str = "default_amzi"):
+        super().__init__(name)
+        
+        # AMZI parameters
+        self.path_difference: float = path_difference  # Time delay [s]
+        self.splitting_ratio: float = splitting_ratio  # Power split ratio
+        self.insertion_loss_db: float = insertion_loss_db  # Loss [dB]
+        
+        # Calculate transmission factors
+        self.transmission_factor: float = np.sqrt(10 ** (-insertion_loss_db / 10))
+        self.short_arm_amplitude: float = np.sqrt(1 - splitting_ratio) * self.transmission_factor
+        self.long_arm_amplitude: float = np.sqrt(splitting_ratio) * self.transmission_factor
+        
+        # Phase controls
+        self.short_arm_phase: float = 0.0
+        self.long_arm_phase: float = 0.0
+        
+        # Fields
+        self.input_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
+        self.short_arm_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
+        self.long_arm_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
+        self.combined_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
+        
+        # Delay buffer
+        self._field_buffer: List[np.complexfloating] = []
+        self._buffer_size: int = 0
+    
+    def set_arm_phases(self, short_phase: float, long_phase: float):
+        """Set phase delays for both arms"""
+        self.short_arm_phase = np.mod(short_phase, 2 * np.pi)
+        self.long_arm_phase = np.mod(long_phase, 2 * np.pi)
+    
+    def simulate(self, clock: Clock, electric_field: np.complexfloating = None):
+        """Simulate AMZI with time-bin encoding"""
+        if electric_field is not None:
+            self.input_field = electric_field
+        else:
+            self.input_field = ERR_TOLERANCE * np.exp(1j * 0)
+        
+        # Initialize buffer
+        if self._buffer_size == 0:
+            self._buffer_size = max(1, int(self.path_difference / clock.dt))
+            self._field_buffer = [ERR_TOLERANCE * np.exp(1j * 0)] * self._buffer_size
+        
+        # Short arm (immediate)
+        short_phase_factor = np.exp(1j * self.short_arm_phase)
+        self.short_arm_field = self.input_field * self.short_arm_amplitude * short_phase_factor
+        
+        # Long arm (delayed)
+        self._field_buffer.append(self.input_field)
+        delayed_field = self._field_buffer.pop(0) if len(self._field_buffer) > self._buffer_size else ERR_TOLERANCE * np.exp(1j * 0)
+        
+        long_phase_factor = np.exp(1j * self.long_arm_phase)
+        self.long_arm_field = delayed_field * self.long_arm_amplitude * long_phase_factor
+        
+        # Combined output
+        self.combined_field = self.short_arm_field + self.long_arm_field
+    
+    def input_port(self):
+        return {'clock': None, 'electric_field': None}
+    
+    def output_port(self, kwargs: dict = {}):
+        kwargs['electric_field'] = self.combined_field
+        kwargs['short_arm_field'] = self.short_arm_field
+        kwargs['long_arm_field'] = self.long_arm_field
+        kwargs['combined_field'] = self.combined_field
+        return kwargs
+
+
 class AsymetricMachZehnderInterferometer:
     """
     Asymetric Mach-Zehnder Interferometer class
