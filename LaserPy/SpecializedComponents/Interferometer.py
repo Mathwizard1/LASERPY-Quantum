@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import numpy as np
 
 from ..Components.Component import Component
 from ..Components import Clock
 
 from .PhotonDetector import SinglePhotonDetector
+
+from collections import namedtuple
 
 from .SimpleDevices import PhaseSample
 from .SimpleDevices import BeamSplitter
@@ -14,14 +18,21 @@ class AsymmetricMachZehnderInterferometer(Component):
     """
     AsymmetricMachZehnderInterferometer class
     """
+
+    # Handling multiport SinglePhotonDetector
+    SPD = namedtuple('SPD', ['target_phase', 'SinglePhotonDetector'])
+
     def __init__(self, clock:Clock, time_delay:float, splitting_ratio:float = 0.5,
                 detector_port_phases: tuple[float,...] = (0.0, np.pi),
+                save_simulation: bool = False,
                 name: str = "default_asymmetric_machzehnder_interferometer"):
         super().__init__(name)
 
+        # Simulation parameters
+        self._save_simulation = save_simulation
+
         # AMZI parameters
         self._time_delay = time_delay
-        # TODO beam splitter
         self._beam_splitter = BeamSplitter()
 
         # Phase controls
@@ -29,9 +40,13 @@ class AsymmetricMachZehnderInterferometer(Component):
         self._long_arm_phase = PhaseSample(name="long_arm_phase")
 
         # Measure ports
-        self._SPDs: list[SinglePhotonDetector] = []
+        rad_to_deg = 180 / np.pi
+
+        self._SPDs: list[AsymmetricMachZehnderInterferometer.SPD] = []
+        """single photon detectors list for AsymmetricMachZehnderInterferometer"""
         for port_phase in detector_port_phases:
-            pass
+            _SPD = SinglePhotonDetector(self._save_simulation, name=f"SPD_{str(int(port_phase * rad_to_deg))}")
+            self._SPDs.append(self.SPD(target_phase= port_phase, SinglePhotonDetector= _SPD))
 
         self._electric_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
         """electric_field data for AsymmetricMachZehnderInterferometer"""
@@ -43,14 +58,18 @@ class AsymmetricMachZehnderInterferometer(Component):
         self._buffer_size: int = int(time_delay / clock.dt)
         self._field_buffer: list[np.complexfloating] = list([ERR_TOLERANCE * np.exp(1j * 0)] * self._buffer_size)
 
-    def reset(self):
+    def reset(self, splitting_ratio: float = 0.5, save_simulation: bool = False):
         """AsymmetricMachZehnderInterferometer reset method"""
         #return super().reset()
         pass
 
-    def set(self):
+        #TODO propagate the changes
+
+    def set(self, clock: Clock, time_delay: float, detector_port_phases: tuple[float,...] = (0.0, np.pi)):
         """AsymmetricMachZehnderInterferometer set method"""
         #return super().set()
+
+        #TODO propagate the changes
         pass
 
     def simulate(self, electric_field: np.complexfloating):
@@ -87,7 +106,7 @@ class AsymmetricMachZehnder(TimeComponent):
         self.combined_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
         
         # Delay buffer
-        self._field_buffer: List[np.complexfloating] = []
+        self._field_buffer: list[np.complexfloating] = []
         self._buffer_size: int = 0
     
     def set_arm_phases(self, short_phase: float, long_phase: float):
@@ -130,89 +149,3 @@ class AsymmetricMachZehnder(TimeComponent):
         kwargs['long_arm_field'] = self.long_arm_field
         kwargs['combined_field'] = self.combined_field
         return kwargs
-
-
-class AsymetricMachZehnderInterferometer:
-    """
-    Asymetric Mach-Zehnder Interferometer class
-    """
-    def __init__(self, t_delay):
-        self.t_delay = t_delay
-        """ time delay of pulse"""
-
-        self.time = None
-
-        # Arm phase change
-        self.phase_sample_long = PhaseSample()
-        self.phase_sample_short = PhaseSample()
-
-        self.SPD_1 = SinglePhotonDetector(np.pi, name= "D1(0)")
-        self.SPD_2 = SinglePhotonDetector(name= "D2(1)")
-
-    def adjust_arm_phases(self, long_arm_phase= 0, short_arm_phase= 0):
-        """ Adjust component values """
-
-        self.phase_sample_long.set_value(long_arm_phase)
-        self.phase_sample_short.set_value(short_arm_phase)
-
-    def adjust_SPD_ClickPhases(self, SPD1_phase= 0, SPD2_phase= 0):
-        """ Adjust SPD click phases """
-
-        self.SPD_1.set_value(SPD1_phase)
-        self.SPD_2.set_value(SPD2_phase)
-
-    def interference(self, E_t1, E_t2):
-        """
-        Simulate inteference
-        """
-
-        # Optical field after passing through arms (phase changes)
-        E1 = self.phase_sample_long(E_t1)
-        E2 = self.phase_sample_short(E_t2)
-
-        #print("Phase changes:", np.angle(E_t1), np.angle(E1), np.angle(E_t2), np.angle(E2))
-
-        # Intensity data
-        I1 = np.abs(E1) ** 2
-        I2 = np.abs(E2) ** 2
-        E1E2_2 = 2 * np.sqrt(I1 * I2)
-
-        return (I1 + I2, E1E2_2, np.angle(E1) - np.angle(E2))
-
-    def reset(self):
-        self.SPD_1.reset()
-        self.SPD_2.reset()
-
-    def simulate(self, signal, time):
-        """
-        Simulate inteference with time delay for Differential Phase Shifted keys
-        """
-        delt_idx = time_to_index(time, self.t_delay)
-        self.time = np.array(time[:-delt_idx])
-
-        num_values = len(time)
-        t_idx = 0
-        while(t_idx + delt_idx < num_values):
-            interference_data = self.interference(signal[t_idx], signal[t_idx + delt_idx])
-            
-            # Send interfered signal to detectors
-            self.SPD_1(interference_data)
-            self.SPD_2(interference_data)
-
-            t_idx += 1
-
-    def plot_SPD_data(self):
-        """
-        Plot the simulation data from Detectors
-        """
-        plt.figure(figsize=(12, 6)) # Create a figure for the plot
-        plt.ylabel(r"Intensity ($W/m^{2}$)")
-        plt.xlabel(r"time ($s$)")
-
-        # Magnitude plot
-        plt.plot(self.time, self.SPD_1.values(), label= self.SPD_1.name)
-        plt.plot(self.time, self.SPD_2.values(), label= self.SPD_2.name)
-
-        plt.grid()
-        plt.legend()
-        plt.show()

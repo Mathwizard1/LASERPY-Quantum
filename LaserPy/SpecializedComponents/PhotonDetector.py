@@ -31,7 +31,7 @@ class SinglePhotonDetector(DataComponent):
         self.photon_count = 0
         self.clicked = False
 
-    def simulate(self, args=None):
+    def simulate(self, intensity:float):
         """SinglePhotonDetector simulate method"""
         #return super().simulate(args)
         # TODO implement SPD
