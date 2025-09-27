@@ -59,10 +59,10 @@ class Clock(Component):
         self._t_final = 0
         """Clock final time data"""
 
-    def reset(self, set_t0_time:bool=False):
+    def reset(self, set_t0:bool=False):
         """Clock reset method"""
         #return super().reset()
-        if(set_t0_time):
+        if(set_t0):
             self.t = 0
         self.running = True
 
@@ -125,6 +125,30 @@ class DataComponent(Component):
         self._simulation_data_units = {}
         """DataComponent simulation data units"""
 
+    def _handle_display_data(self, time_data:np.ndarray):
+        """DataComponent _handle_display_data method"""
+        if(self._handle_get_data()):
+            return True
+        elif(time_data is None):
+            print(f"{self.name} got None for time_data")
+            return True
+        else:
+            for key in self._simulation_data:
+                if(len(time_data) != len(self._simulation_data[key])):
+                    print(f"{self.name} {key} has {len(self._simulation_data[key])} while time_data has {len(time_data)}")
+                    return True
+        return False
+
+    def _handle_get_data(self):
+        """DataComponent _handle_get_data method"""
+        if(not self._save_simulation):
+            print(f"{self.name} did not save simulation data")
+            return True
+        elif(len(self._simulation_data) == 0):
+            print(f"{self.name}'s simulation data is empty")
+            return True
+        return False
+
     def store_data(self):
         """DataComponent store_data method"""
         for key in self._simulation_data:
@@ -136,15 +160,14 @@ class DataComponent(Component):
         for key in self._simulation_data:
             self._simulation_data[key].clear()
 
-    def display_data(self, time_data:np.ndarray|None, simulation_keys:tuple[str,...]|None=None):
-        """DataComponent display_data method"""
-        if(not self._save_simulation):
-            print(f"{self.name} did not save simulation data")
-            return
-        elif(time_data is None):
-            print(f"{self.name} got None for time_data")
-            return
+    def display_data(self, time_data:np.ndarray, simulation_keys:tuple[str,...]|None=None):
+        """DataComponent display_data method"""        
         
+        # Handle cases
+        if(self._handle_display_data(time_data)):
+            print(f"{self.name} cannot display data")
+            return
+
         plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
 
         key_tuple = tuple(self._simulation_data_units)
@@ -169,13 +192,13 @@ class DataComponent(Component):
 
     def get_data(self):
         """DataComponent get_data method"""
-        if(not self._save_simulation):
-            print(f"{self.name} did not save simulation dat")
-            return
+
+        # Handle cases
+        val = self._handle_get_data()
         
         data_dict = {}
         for key in self._simulation_data:
-            data_dict[key] = np.array(self._simulation_data[key])
+            data_dict[key] = np.zeros(1) if(val) else np.array(self._simulation_data[key])
         return data_dict
 
     def output_port(self, kwargs:dict={}):

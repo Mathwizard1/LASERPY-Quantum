@@ -47,13 +47,14 @@ class Simulator(DataComponent):
     """
     Simulator class
     """
-    def __init__(self, simulation_clock:Clock, name:str="default_simulator"):
-        super().__init__(True, name)
+    def __init__(self, simulation_clock:Clock, save_simulation:bool=False, name:str="default_simulator"):
+        super().__init__(save_simulation, name)
         self.simulation_clock = simulation_clock
 
         # Data storage
-        self._simulation_data = []
-        self._simulation_data_units = r" $(s)$"
+        if(self._save_simulation):
+            self._simulation_data: list[float] = []
+            self._simulation_data_units = r" $(s)$"
 
     def store_data(self):
         """Simulator store_data method"""
@@ -70,6 +71,12 @@ class Simulator(DataComponent):
     def display_data(self):
         """Simulator display_data method"""
         #return super().display_data()
+
+        # Handle cases
+        if(self._handle_get_data()):
+            print(f"{self.name} cannot display data")
+            return
+
         plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
 
         time_data = np.array(self._simulation_data)
@@ -80,11 +87,17 @@ class Simulator(DataComponent):
         plt.grid()
 
         plt.legend()
+        plt.tight_layout()
         plt.show()
 
     def get_data(self):
         """Simulator get_data method"""
         #return super().get_data()
+
+        # Handle cases
+        if(self._handle_get_data()):
+            print(f"{self.name} returning single zero-element np array")
+            return np.array([0.0])
         return np.array(self._simulation_data)
 
     def set(self, connections:Connection|tuple[Connection,...]):
@@ -101,6 +114,7 @@ class Simulator(DataComponent):
             for connection in self._connections:
                     connection.simulate(self.simulation_clock)
             
-            self.store_data()
+            if(self._save_simulation):
+                self.store_data()
             self.simulation_clock.update()
         print("Simulations Complete")
