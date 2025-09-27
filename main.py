@@ -6,7 +6,8 @@ from LaserPy import ArbitaryWave, ArbitaryWaveGenerator
 from LaserPy import CurrentDriver
 from LaserPy import Laser
 
-from LaserPy.SpecializedComponents.SimpleDevices import PhaseSample, SinglePhotonDetector
+from LaserPy.SpecializedComponents import PhaseSample
+from LaserPy.SpecializedComponents import PhaseSensitiveSPD
 
 # Control Constants (all in SI units)
 modulation_bits = [0] * 10 + [0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1]
@@ -95,13 +96,13 @@ slave_laser = Laser(save_simulation= True, name= "slave_laser")
 
 PS = PhaseSample(np.pi / 2)
 
-SPD1 = SinglePhotonDetector(target_phase= np.pi / 2, save_simulation= True)
-SPD2 = SinglePhotonDetector(target_phase= np.pi / 2, save_simulation= True)
+SPD1 = PhaseSensitiveSPD(target_phase= 0, save_simulation= True)
+SPD2 = PhaseSensitiveSPD(target_phase= np.pi, save_simulation= True)
 
 simulator_clock = Clock(dt)
 simulator_clock.set(t_unit * 5)
 
-simulator = Simulator(simulator_clock)
+simulator = Simulator(simulator_clock, save_simulation= True)
 
 simulator.set((
     Connection(simulator_clock, (current_driver1, current_driver2)),
