@@ -59,6 +59,40 @@ class BeamSplitter(Component):
     """
     BeamSplitter class
     """
-    def __init__(self, name: str = "default_beam_splitter"):
+    def __init__(self, splitting_ratio_t: float = 0.5, name: str = "default_beam_splitter"):
         super().__init__(name)
-        # TODO beam splitter
+
+        # Field coefficients
+        self._t = np.sqrt(splitting_ratio_t)
+        self._r = np.exp(1j * np.pi) * np.sqrt(1 - splitting_ratio_t)
+
+        # Field variables
+        self._E_transmitted = ERR_TOLERANCE * np.exp(1j * 0)
+        self._E_reflected = ERR_TOLERANCE * np.exp(1j * 0)
+
+    def set(self, splitting_ratio_t: float):
+        """BeamSplitter reset method"""
+        #return super().set()
+        self._t = np.sqrt(splitting_ratio_t)
+        self._r = np.exp(1j * np.pi) * np.sqrt(1 - splitting_ratio_t)
+
+    def simulate(self, electric_field: np.complexfloating, electric_field_port2: np.complexfloating):
+        """BeamSplitter simulate method"""
+        #return super().simulate(args)
+        self._E_transmitted = self._t * electric_field + self._r * electric_field_port2
+        self._E_reflected = self._r * electric_field + self._t * electric_field_port2
+
+    def input_port(self):
+        """BeamSplitter input port method"""
+        #return super().input_port()
+        
+        # Default port2 electric field
+        kwargs = {'electric_field':None, 'electric_field_port2':ERR_TOLERANCE * np.exp(1j * 0)}
+        return kwargs
+    
+    def output_port(self, kwargs: dict = {}):
+        """BeamSplitter output port method"""
+        #return super().output_port(kwargs)
+        kwargs['electric_field'] = self._E_transmitted
+        kwargs['electric_field_port2'] = self._E_reflected
+        return kwargs
