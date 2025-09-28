@@ -2,7 +2,8 @@ import numpy as np
 
 from ..Components.Component import Component
 
-from ..Constants import ERR_TOLERANCE
+from ..Constants import EMPTY_FIELD
+from ..Constants import FULL_PHASE_INTERVAL
 
 class PhaseSample(Component):
     """
@@ -11,22 +12,21 @@ class PhaseSample(Component):
     def __init__(self, phase_delay: float = 0.0, name: str = "default_phase_sample"):
         super().__init__(name)
 
-        self._phase_interval = 2 * np.pi
+        self._phase_interval = FULL_PHASE_INTERVAL
         """phase interval for PhaseSample"""
 
         phase_delay = np.mod(phase_delay, self._phase_interval)
         self._phase_change = np.exp(1j * phase_delay)
         """phase change for PhaseSample"""
 
-        self._electric_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
+        self._electric_field: np.complexfloating = EMPTY_FIELD
         """electric_field data for PhaseSample"""
 
     def reset(self):
         """PhaseSample reset method"""
         #return super().reset()
-        self._electric_field = ERR_TOLERANCE * np.exp(1j * 0)
-        self._phase_interval = 2 * np.pi
-        self._phase_change = np.exp(1j * 0)
+        self._electric_field = EMPTY_FIELD
+        self._phase_interval = FULL_PHASE_INTERVAL
 
     def set(self, phase_delay: float, phase_interval: float|None= None):
         """PhaseSample set method"""
@@ -42,6 +42,7 @@ class PhaseSample(Component):
 
         # Add phase change
         self._electric_field = self._phase_change * electric_field
+        return self._electric_field
 
     def input_port(self):
         """PhaseSample input port method"""
@@ -55,6 +56,18 @@ class PhaseSample(Component):
         kwargs['electric_field'] = self._electric_field
         return kwargs
     
+class Mirror(PhaseSample):
+    """
+    Mirror class
+    """
+    def __init__(self, name: str = "default_mirror"):
+        super().__init__(np.pi, name)
+
+    def set(self):
+        """Mirror empty set method"""
+        #return super().set(phase_delay, phase_interval)
+        print("Mirror phase is fixed at 2pi")
+
 class BeamSplitter(Component):
     """
     BeamSplitter class
@@ -67,8 +80,8 @@ class BeamSplitter(Component):
         self._r = np.exp(1j * np.pi) * np.sqrt(1 - splitting_ratio_t)
 
         # Field variables
-        self._E_transmitted = ERR_TOLERANCE * np.exp(1j * 0)
-        self._E_reflected = ERR_TOLERANCE * np.exp(1j * 0)
+        self._E_transmitted: np.complexfloating = EMPTY_FIELD
+        self._E_reflected: np.complexfloating = EMPTY_FIELD
 
     def set(self, splitting_ratio_t: float):
         """BeamSplitter reset method"""
@@ -76,18 +89,19 @@ class BeamSplitter(Component):
         self._t = np.sqrt(splitting_ratio_t)
         self._r = np.exp(1j * np.pi) * np.sqrt(1 - splitting_ratio_t)
 
-    def simulate(self, electric_field: np.complexfloating, electric_field_port2: np.complexfloating):
+    def simulate(self, electric_field: np.complexfloating, electric_field_port2: np.complexfloating = EMPTY_FIELD):
         """BeamSplitter simulate method"""
         #return super().simulate(args)
         self._E_transmitted = self._t * electric_field + self._r * electric_field_port2
         self._E_reflected = self._r * electric_field + self._t * electric_field_port2
+        return self._E_transmitted, self._E_reflected
 
     def input_port(self):
         """BeamSplitter input port method"""
         #return super().input_port()
         
         # Default port2 electric field
-        kwargs = {'electric_field':None, 'electric_field_port2':ERR_TOLERANCE * np.exp(1j * 0)}
+        kwargs = {'electric_field':None, 'electric_field_port2':EMPTY_FIELD}
         return kwargs
     
     def output_port(self, kwargs: dict = {}):

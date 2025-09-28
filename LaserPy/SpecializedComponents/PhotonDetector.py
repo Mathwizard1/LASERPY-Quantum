@@ -3,6 +3,9 @@ import numpy as np
 from ..Components import Clock
 from ..Components import DataComponent
 
+from ..Constants import EMPTY_FIELD
+from ..Constants import FULL_PHASE_INTERVAL
+
 class SinglePhotonDetector(DataComponent):
     """
     SinglePhotonDetector class
@@ -22,7 +25,7 @@ class SinglePhotonDetector(DataComponent):
         # Data storage
         if save_simulation:
             self._simulation_data = {'intensity': []}#, 'photon_count': [], 'clicked': []}
-            self._simulation_data_units = {'intensity': r' $(W/m^2)$'}#, 'photon_count': r' $(counts)$', 'clicked': r' $(boolean)$'}
+            self._simulation_data_units = {'intensity': r" $(W/m^2)$"}#, 'photon_count': r' $(counts)$', 'clicked': r' $(boolean)$'}
 
     def reset(self):
         """SinglePhotonDetector reset method"""
@@ -40,7 +43,7 @@ class SinglePhotonDetector(DataComponent):
     def input_port(self):
         """SinglePhotonDetector input port method"""
         #return super().input_port()
-        kwargs = {'intensity': None}
+        kwargs = {'intensity':None}
         return kwargs
 
 class PhaseSensitiveSPD(SinglePhotonDetector):

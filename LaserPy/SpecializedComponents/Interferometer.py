@@ -7,25 +7,25 @@ from ..Components import Clock
 
 from .PhotonDetector import SinglePhotonDetector
 
-from collections import namedtuple
+#from collections import namedtuple
 
-from .SimpleDevices import PhaseSample
+from .SimpleDevices import PhaseSample, Mirror
 from .SimpleDevices import BeamSplitter
 
-from ..Constants import ERR_TOLERANCE
+from ..Constants import EMPTY_FIELD
+from ..Constants import FULL_PHASE_INTERVAL
+
+# TODO multiport
+# Handling multiport SinglePhotonDetector
+# SPD = namedtuple('SPD', ['target_phase', 'SinglePhotonDetector'])
 
 class AsymmetricMachZehnderInterferometer(Component):
     """
     AsymmetricMachZehnderInterferometer class
     """
-
-    # Handling multiport SinglePhotonDetector
-    SPD = namedtuple('SPD', ['target_phase', 'SinglePhotonDetector'])
-
-    def __init__(self, clock:Clock, time_delay:float, splitting_ratio:float = 0.5,
-                detector_port_phases: tuple[float,...] = (0.0, np.pi),
-                save_simulation: bool = False,
-                name: str = "default_asymmetric_machzehnder_interferometer"):
+    def __init__(self, clock:Clock, time_delay:float, 
+                 splitting_ratio_ti:float = 0.5, splitting_ratio_tf:float = 0.5,
+                save_simulation: bool = False, name: str = "default_asymmetric_machzehnder_interferometer"):
         super().__init__(name)
 
         # Simulation parameters
@@ -33,49 +33,88 @@ class AsymmetricMachZehnderInterferometer(Component):
 
         # AMZI parameters
         self._time_delay = time_delay
-        self._beam_splitter = BeamSplitter()
+        self._input_beam_splitter = BeamSplitter(splitting_ratio_ti, name="input_beam_splitter")
+        self._output_beam_joiner = BeamSplitter(splitting_ratio_tf, name="output_beam_joiner")
 
         # Phase controls
-        self._short_arm_phase = PhaseSample(name="short_arm_phase")
-        self._long_arm_phase = PhaseSample(name="long_arm_phase")
+        self._mirror = Mirror(name=f"common_mirror")
+        self._short_arm_phase_sample = PhaseSample(name="short_arm_phase_sample")
+        self._long_arm_phase_sample = PhaseSample(name="long_arm_phase_sample")
 
         # Measure ports
-        rad_to_deg = 180 / np.pi
+        self._SPD0 = SinglePhotonDetector(self._save_simulation, name=f"SPD_0")
+        self._SPD1 = SinglePhotonDetector(self._save_simulation, name=f"SPD_1")
 
-        self._SPDs: list[AsymmetricMachZehnderInterferometer.SPD] = []
-        """single photon detectors list for AsymmetricMachZehnderInterferometer"""
-        for port_phase in detector_port_phases:
-            _SPD = SinglePhotonDetector(self._save_simulation, name=f"SPD_{str(int(port_phase * rad_to_deg))}")
-            self._SPDs.append(self.SPD(target_phase= port_phase, SinglePhotonDetector= _SPD))
-
-        self._electric_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
+        self._electric_field: np.complexfloating = EMPTY_FIELD
         """electric_field data for AsymmetricMachZehnderInterferometer"""
 
         self._intensity: float = 0.0
         """intensity data for AsymmetricMachZehnderInterferometer"""
 
         # Delay buffer
-        self._buffer_size: int = int(time_delay / clock.dt)
-        self._field_buffer: list[np.complexfloating] = list([ERR_TOLERANCE * np.exp(1j * 0)] * self._buffer_size)
+        self._buffer_size: int = max(1, int(time_delay / clock.dt))
+        self._field_buffer: list[np.complexfloating] = []
 
-    def reset(self, splitting_ratio: float = 0.5, save_simulation: bool = False):
+    def reset(self, save_simulation: bool = False):
         """AsymmetricMachZehnderInterferometer reset method"""
         #return super().reset()
         pass
 
         #TODO propagate the changes
 
-    def set(self, clock: Clock, time_delay: float, detector_port_phases: tuple[float,...] = (0.0, np.pi)):
+    def set(self, clock: Clock, time_delay: float, 
+            splitting_ratio_ti: float = 0.5, splitting_ratio_tf: float = 0.5):
         """AsymmetricMachZehnderInterferometer set method"""
         #return super().set()
 
-        #TODO propagate the changes
-        pass
+        # Beam splitters
+        self._input_beam_splitter.set(splitting_ratio_ti)
+        self._output_beam_joiner.set(splitting_ratio_tf)
+
+        # Delay buffer
+        self._buffer_size = max(1, int(time_delay / clock.dt))
+        self._field_buffer.clear()
+
+    def set_phases(self, short_arm_phase: float, long_arm_phase: float, 
+                short_arm_phase_interval: float = FULL_PHASE_INTERVAL, long_arm_phase_interval: float = FULL_PHASE_INTERVAL):
+        """AsymmetricMachZehnderInterferometer set phases method"""
+        self._short_arm_phase_sample.set(short_arm_phase, phase_interval= short_arm_phase_interval)
+        self._long_arm_phase_sample.set(long_arm_phase, phase_interval= long_arm_phase_interval)
 
     def simulate(self, electric_field: np.complexfloating):
         """AsymmetricMachZehnderInterferometer simulate method"""
         #return super().simulate(clock)
-        pass
+
+        # input field
+        E_short, E_long = self._input_beam_splitter.simulate(electric_field)
+
+        # long arm
+        E_long = self._long_arm_phase_sample.simulate(E_long)
+        E_long = self._mirror.simulate(E_long)
+
+        # Handle buffer
+        self._field_buffer.append(E_long)
+        E_long = self._field_buffer.pop(0) if len(self._field_buffer) > self._buffer_size else EMPTY_FIELD
+
+        # short arm
+        E_short = self._mirror.simulate(E_short)
+        E_short = self._short_arm_phase_sample.simulate(E_short)
+
+        # Recombine
+        electric_field, electric_field_port2 = self._output_beam_joiner.simulate(E_short, E_long)
+
+    def input_port(self):
+        """AsymmetricMachZehnderInterferometer input port method"""
+        #return super().input_port()
+        kwargs = {'electric_field':None}
+        return kwargs
+    
+    def output_port(self, kwargs: dict = {}):
+        """AsymmetricMachZehnderInterferometer output port method"""
+        #return super().output_port(kwargs)
+        kwargs['intensity'] = self._intensity
+        kwargs['electric_field'] = self._electric_field
+        return kwargs
 
 class AsymmetricMachZehnder(TimeComponent):
     """
