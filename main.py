@@ -6,8 +6,7 @@ from LaserPy import ArbitaryWave, ArbitaryWaveGenerator
 from LaserPy import CurrentDriver
 from LaserPy import Laser
 
-from LaserPy.SpecializedComponents import PhaseSample
-from LaserPy.SpecializedComponents import PhaseSensitiveSPD
+from LaserPy import AsymmetricMachZehnderInterferometer
 
 # Control Constants (all in SI units)
 modulation_bits = [0] * 10 + [0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1]
@@ -94,13 +93,10 @@ current_driver2.set(sBase)
 master_laser = Laser(save_simulation= True, name= "master_laser")
 slave_laser = Laser(save_simulation= True, name= "slave_laser")
 
-PS = PhaseSample(np.pi / 2)
-
-SPD1 = PhaseSensitiveSPD(target_phase= 0, save_simulation= True)
-SPD2 = PhaseSensitiveSPD(target_phase= np.pi, save_simulation= True)
-
 simulator_clock = Clock(dt)
 simulator_clock.set(t_unit * 5)
+
+AMZI = AsymmetricMachZehnderInterferometer(simulator_clock, time_delay= t_unit, save_simulation= True)
 
 simulator = Simulator(simulator_clock, save_simulation= True)
 
@@ -108,15 +104,14 @@ simulator.set((
     Connection(simulator_clock, (current_driver1, current_driver2)),
     Connection(current_driver1, master_laser),
     Connection((current_driver2, master_laser), slave_laser),
-    Connection(slave_laser, (PS, SPD1)),
-    Connection(PS, SPD2)
+    Connection(slave_laser, AMZI),
 ))
 
 simulator.simulate()
-#time_data = simulator.get_data()
+time_data = simulator.get_data()
 
-#master_laser.display_data(time_data)
-#slave_laser.display_data(time_data)
+master_laser.display_data(time_data)
+slave_laser.display_data(time_data)
 
 simulator_clock.set(t_final)
 simulator_clock.reset()
@@ -126,8 +121,7 @@ slave_laser.set_master_Laser(master_laser)
 simulator.simulate()
 time_data = simulator.get_data()
 
-#master_laser.display_data(time_data)
-#slave_laser.display_data(time_data)
+master_laser.display_data(time_data)
+slave_laser.display_data(time_data)
 
-SPD1.display_data(time_data)
-SPD2.display_data(time_data)
+AMZI.display_SPD_data(time_data)

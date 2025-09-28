@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from ..Components.Component import Component
@@ -14,6 +15,8 @@ from .SimpleDevices import BeamSplitter
 
 from ..Constants import EMPTY_FIELD
 from ..Constants import FULL_PHASE_INTERVAL
+
+from ..Constants import FIG_WIDTH, FIG_HEIGHT
 
 # TODO multiport
 # Handling multiport SinglePhotonDetector
@@ -48,8 +51,8 @@ class AsymmetricMachZehnderInterferometer(Component):
         self._electric_field: np.complexfloating = EMPTY_FIELD
         """electric_field data for AsymmetricMachZehnderInterferometer"""
 
-        self._intensity: float = 0.0
-        """intensity data for AsymmetricMachZehnderInterferometer"""
+        self._electric_field_port2: np.complexfloating = EMPTY_FIELD
+        """electric_field_port2 data for AsymmetricMachZehnderInterferometer"""
 
         # Delay buffer
         self._buffer_size: int = max(1, int(time_delay / clock.dt))
@@ -101,7 +104,11 @@ class AsymmetricMachZehnderInterferometer(Component):
         E_short = self._short_arm_phase_sample.simulate(E_short)
 
         # Recombine
-        electric_field, electric_field_port2 = self._output_beam_joiner.simulate(E_short, E_long)
+        self._electric_field, self._electric_field_port2 = self._output_beam_joiner.simulate(E_short, E_long)
+        
+        # Photon Detection
+        self._SPD0.simulate(self._electric_field)
+        self._SPD1.simulate(self._electric_field_port2)
 
     def input_port(self):
         """AsymmetricMachZehnderInterferometer input port method"""
@@ -112,79 +119,40 @@ class AsymmetricMachZehnderInterferometer(Component):
     def output_port(self, kwargs: dict = {}):
         """AsymmetricMachZehnderInterferometer output port method"""
         #return super().output_port(kwargs)
-        kwargs['intensity'] = self._intensity
         kwargs['electric_field'] = self._electric_field
+        kwargs['electric_field_port2'] = self._electric_field_port2
         return kwargs
+    
+    def display_SPD_data(self, time_data:np.ndarray):
+        """AsymmetricMachZehnderInterferometer display_SPD_data method"""        
+        
+        # Handle cases
+        if(not self._save_simulation):
+            print(f"{self.name} cannot display data")
+            return
 
-class AsymmetricMachZehnder(TimeComponent):
-    """
-    AMZI component for time-bin encoding with your Laser.electric_field
-    """
-    def __init__(self, path_difference: float = 5e-9, splitting_ratio: float = 0.5,
-                 insertion_loss_db: float = 3.0, name: str = "default_amzi"):
-        super().__init__(name)
-        
-        # AMZI parameters
-        self.path_difference: float = path_difference  # Time delay [s]
-        self.splitting_ratio: float = splitting_ratio  # Power split ratio
-        self.insertion_loss_db: float = insertion_loss_db  # Loss [dB]
-        
-        # Calculate transmission factors
-        self.transmission_factor: float = np.sqrt(10 ** (-insertion_loss_db / 10))
-        self.short_arm_amplitude: float = np.sqrt(1 - splitting_ratio) * self.transmission_factor
-        self.long_arm_amplitude: float = np.sqrt(splitting_ratio) * self.transmission_factor
-        
-        # Phase controls
-        self.short_arm_phase: float = 0.0
-        self.long_arm_phase: float = 0.0
-        
-        # Fields
-        self.input_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
-        self.short_arm_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
-        self.long_arm_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
-        self.combined_field: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
-        
-        # Delay buffer
-        self._field_buffer: list[np.complexfloating] = []
-        self._buffer_size: int = 0
-    
-    def set_arm_phases(self, short_phase: float, long_phase: float):
-        """Set phase delays for both arms"""
-        self.short_arm_phase = np.mod(short_phase, 2 * np.pi)
-        self.long_arm_phase = np.mod(long_phase, 2 * np.pi)
-    
-    def simulate(self, clock: Clock, electric_field: np.complexfloating = None):
-        """Simulate AMZI with time-bin encoding"""
-        if electric_field is not None:
-            self.input_field = electric_field
-        else:
-            self.input_field = ERR_TOLERANCE * np.exp(1j * 0)
-        
-        # Initialize buffer
-        if self._buffer_size == 0:
-            self._buffer_size = max(1, int(self.path_difference / clock.dt))
-            self._field_buffer = [ERR_TOLERANCE * np.exp(1j * 0)] * self._buffer_size
-        
-        # Short arm (immediate)
-        short_phase_factor = np.exp(1j * self.short_arm_phase)
-        self.short_arm_field = self.input_field * self.short_arm_amplitude * short_phase_factor
-        
-        # Long arm (delayed)
-        self._field_buffer.append(self.input_field)
-        delayed_field = self._field_buffer.pop(0) if len(self._field_buffer) > self._buffer_size else ERR_TOLERANCE * np.exp(1j * 0)
-        
-        long_phase_factor = np.exp(1j * self.long_arm_phase)
-        self.long_arm_field = delayed_field * self.long_arm_amplitude * long_phase_factor
-        
-        # Combined output
-        self.combined_field = self.short_arm_field + self.long_arm_field
-    
-    def input_port(self):
-        return {'clock': None, 'electric_field': None}
-    
-    def output_port(self, kwargs: dict = {}):
-        kwargs['electric_field'] = self.combined_field
-        kwargs['short_arm_field'] = self.short_arm_field
-        kwargs['long_arm_field'] = self.long_arm_field
-        kwargs['combined_field'] = self.combined_field
-        return kwargs
+        plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
+
+        key_tuple = tuple(self._simulation_data_units)
+        if(simulation_keys):
+            key_tuple = simulation_keys
+
+        max_hf_plots = 1 + (len(key_tuple) >> 1)
+        sub_plot_idx = 1
+        for key in key_tuple:
+            plt.subplot(max_hf_plots, 2, sub_plot_idx)
+            plt.plot(time_data, np.array(self._simulation_data[key]), label=f"{key}")
+
+            plt.xlabel(r"Time $(s)$")
+            plt.ylabel(key.capitalize() + self._simulation_data_units[key])
+            
+            plt.grid()
+            plt.legend()
+            sub_plot_idx += 1
+
+        plt.tight_layout()
+        plt.show()
+
+    def get_SPD_data(self):
+        # TODO get SPD data
+        pass

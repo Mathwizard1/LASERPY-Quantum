@@ -2,7 +2,7 @@
 
 from .ComponentDriver import CurrentDriver
 
-#from .Interferometer import 
+from .Interferometer import AsymmetricMachZehnderInterferometer
 
 from .Laser import Laser
 

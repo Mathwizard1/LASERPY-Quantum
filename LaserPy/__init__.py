@@ -12,5 +12,6 @@ from .Components import Simulator
 
 from .SpecializedComponents import CurrentDriver
 from .SpecializedComponents import Laser
+from .SpecializedComponents import AsymmetricMachZehnderInterferometer
 
 __version__ = '0.0.0'

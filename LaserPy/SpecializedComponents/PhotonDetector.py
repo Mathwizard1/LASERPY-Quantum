@@ -3,7 +3,6 @@ import numpy as np
 from ..Components import Clock
 from ..Components import DataComponent
 
-from ..Constants import EMPTY_FIELD
 from ..Constants import FULL_PHASE_INTERVAL
 
 class SinglePhotonDetector(DataComponent):
@@ -34,16 +33,22 @@ class SinglePhotonDetector(DataComponent):
         self.photon_count = 0
         self.clicked = False
 
-    def simulate(self, intensity:float):
+    def simulate(self, electric_field: np.complexfloating):
         """SinglePhotonDetector simulate method"""
         #return super().simulate(args)
-        # TODO implement SPD
-        pass
+
+        self.intensity = np.square(np.abs(electric_field))
+
+        # TODO implement clicked
+        # TODO implement photon count
+
+        if(self._save_simulation):
+            self.store_data()
 
     def input_port(self):
         """SinglePhotonDetector input port method"""
         #return super().input_port()
-        kwargs = {'intensity':None}
+        kwargs = {'electric_field': None}
         return kwargs
 
 class PhaseSensitiveSPD(SinglePhotonDetector):
@@ -68,19 +73,7 @@ class PhaseSensitiveSPD(SinglePhotonDetector):
     def simulate(self, electric_field: np.complexfloating):
         """PhaseSensitiveSPD simulate method"""
         #return super().simulate(args)
-        E_magnitude = np.abs(electric_field)
-        E_angle = np.angle(electric_field)
 
-        self.intensity = max(np.square(E_magnitude) * np.cos(E_angle - self._target_phase), 0.0)
-
-        # TODO implement clicked
-        # TODO implement photon count
 
         if(self._save_simulation):
             self.store_data()
-
-    def input_port(self):
-        """PhaseSensitiveSPD input port method"""
-        #return super().input_port()
-        kwargs = {'electric_field': None}
-        return kwargs
