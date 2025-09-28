@@ -174,7 +174,7 @@ class DataComponent(Component):
         if(simulation_keys):
             key_tuple = simulation_keys
 
-        max_hf_plots = 1 + (len(key_tuple) // 2)
+        max_hf_plots = 1 + (len(key_tuple) >> 1)
         sub_plot_idx = 1
         for key in key_tuple:
             plt.subplot(max_hf_plots, 2, sub_plot_idx)
