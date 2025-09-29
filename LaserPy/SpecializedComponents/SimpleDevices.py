@@ -57,7 +57,7 @@ class Mirror(PhaseSample):
     def __init__(self, name: str = "default_mirror"):
         super().__init__(np.pi, name)
 
-    def set(self, args= ...):
+    def set(self):
         """Mirror set method"""
         #return super().set(phase_delay, phase_interval)
         print("Mirror phase is fixed at pi")

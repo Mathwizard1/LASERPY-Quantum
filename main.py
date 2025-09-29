@@ -1,5 +1,3 @@
-import numpy as np
-
 from LaserPy import Clock
 from LaserPy import Connection, Simulator
 from LaserPy import ArbitaryWave, ArbitaryWaveGenerator

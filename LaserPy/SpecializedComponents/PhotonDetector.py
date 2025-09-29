@@ -44,6 +44,7 @@ class SinglePhotonDetector(DataComponent):
         kwargs = {'electric_field': None}
         return kwargs
 
+# TODO phasesensitiveSPD
 class PhaseSensitiveSPD(SinglePhotonDetector):
     """
     PhaseSensitiveSPD class

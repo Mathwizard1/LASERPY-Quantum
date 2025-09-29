@@ -95,7 +95,7 @@ class Laser(PhysicalComponent):
         dPhi_dt = self._Alpha / 2 * (self._Gamma_cap * self._g * (self.carrier - self._N_transparent) - 1 / self._TAU_P) + self._Fphi_t()
         return dPhi_dt
 
-    def set_Noise(self, Fn_t:NoNoise, Fs_t:NoNoise, Fphi_t:NoNoise):
+    def set_noise(self, Fn_t:NoNoise, Fs_t:NoNoise, Fphi_t:NoNoise):
         """Laser set noise method""" 
         self._Fn_t = Fn_t
         self._Fs_t = Fs_t
@@ -108,7 +108,7 @@ class Laser(PhysicalComponent):
 
     def simulate(self, clock: Clock, current: float, injection_field: InjectionField|None = None):
         """Laser simulate method"""
-        #return super().simulate(clock, data)
+        #return super().simulate(clock, _data)
 
         # Save current in its variable
         self.current = current
