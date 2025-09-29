@@ -58,6 +58,16 @@ class AsymmetricMachZehnderInterferometer(Component):
         self._buffer_size: int = max(1, int(time_delay / clock.dt))
         self._field_buffer: list[np.complexfloating] = []
 
+    def _handle_SPD_data(self):
+        """AsymmetricMachZehnderInterferometer _handle_SPD_data method"""
+        if(not self._save_simulation):
+            print(f"{self.name} did not save simulation data")
+            return True
+        elif(self._SPD0._handle_get_data() or self._SPD1._handle_get_data()):
+            print(f"{self.name} cannot get SPD data")
+            return True
+        return False
+
     def reset(self, save_simulation: bool = False):
         """AsymmetricMachZehnderInterferometer reset method"""
         #return super().reset()
@@ -104,8 +114,9 @@ class AsymmetricMachZehnderInterferometer(Component):
         E_short = self._short_arm_phase_sample.simulate(E_short)
 
         # Recombine
+        #print(E_short, E_long)
         self._electric_field, self._electric_field_port2 = self._output_beam_joiner.simulate(E_short, E_long)
-        
+
         # Photon Detection
         self._SPD0.simulate(self._electric_field)
         self._SPD1.simulate(self._electric_field_port2)
@@ -123,28 +134,41 @@ class AsymmetricMachZehnderInterferometer(Component):
         kwargs['electric_field_port2'] = self._electric_field_port2
         return kwargs
     
-    def display_SPD_data(self, time_data:np.ndarray):
+    def display_SPD_data(self, time_data:np.ndarray, simulation_keys:tuple[str,...]|None=None):
         """AsymmetricMachZehnderInterferometer display_SPD_data method"""        
+
+        # Get SPD data
+        _SPD_data = self.get_SPD_data()
         
-        # Handle cases
-        if(not self._save_simulation):
-            print(f"{self.name} cannot display data")
+        # handle cases
+        if(_SPD_data is None):
             return
+
+        _SPD_data_units = self._SPD0.get_data_units()
 
         plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
 
-        key_tuple = tuple(self._simulation_data_units)
+        key_tuple = tuple(_SPD_data_units)
+
+        # Display fixed tuple of data
         if(simulation_keys):
-            key_tuple = simulation_keys
+            key_list = []
+            for key in simulation_keys:
+                if(key in _SPD_data_units):
+                    key_list.append(key)
+            key_tuple = tuple(key_list)
 
         max_hf_plots = 1 + (len(key_tuple) >> 1)
         sub_plot_idx = 1
         for key in key_tuple:
             plt.subplot(max_hf_plots, 2, sub_plot_idx)
-            plt.plot(time_data, np.array(self._simulation_data[key]), label=f"{key}")
+
+            # Dual plot
+            for SPD in _SPD_data:
+                plt.plot(time_data, np.array(_SPD_data[SPD][key]), label=f"{SPD}")
 
             plt.xlabel(r"Time $(s)$")
-            plt.ylabel(key.capitalize() + self._simulation_data_units[key])
+            plt.ylabel(key.capitalize() + _SPD_data_units[key])
             
             plt.grid()
             plt.legend()
@@ -154,5 +178,12 @@ class AsymmetricMachZehnderInterferometer(Component):
         plt.show()
 
     def get_SPD_data(self):
-        # TODO get SPD data
-        pass
+        """AsymmetricMachZehnderInterferometer get_SPD_data method"""
+
+        # handle cases
+        if(self._handle_SPD_data()):
+            return
+
+        # Store SPD data
+        _SPD_data = {'SPD0':self._SPD0.get_data(), 'SPD1':self._SPD1.get_data()}
+        return _SPD_data

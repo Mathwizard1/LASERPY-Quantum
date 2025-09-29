@@ -36,6 +36,7 @@ class SinglePhotonDetector(DataComponent):
     def simulate(self, electric_field: np.complexfloating):
         """SinglePhotonDetector simulate method"""
         #return super().simulate(args)
+        
 
         self.intensity = np.square(np.abs(electric_field))
 
