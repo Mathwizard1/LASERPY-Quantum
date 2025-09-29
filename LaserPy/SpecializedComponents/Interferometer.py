@@ -122,7 +122,6 @@ class AsymmetricMachZehnderInterferometer(Component):
         E_short = self._short_arm_phase_sample.simulate(E_short)
 
         # Recombine
-        #print(E_short, E_long)
         self._electric_field, self._electric_field_port2 = self._output_beam_joiner.simulate(E_short, E_long)
 
         # Photon Detection

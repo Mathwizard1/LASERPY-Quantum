@@ -3,6 +3,9 @@ import numpy as np
 
 from ..Constants import FIG_WIDTH, FIG_HEIGHT
 
+# TODO add unique component id on runtime instance
+# TODO refine reset and reset_data behaviour
+
 class Component:
     """
     Component class
@@ -163,7 +166,6 @@ class DataComponent(Component):
 
     def reset_data(self):
         """DataComponent reset_data method"""
-        print(str(self))
         for key in self._simulation_data:
             self._simulation_data[key].clear()
 
