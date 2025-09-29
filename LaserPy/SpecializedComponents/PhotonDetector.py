@@ -25,19 +25,6 @@ class SinglePhotonDetector(DataComponent):
         self._simulation_data = {'intensity': []}#, 'photon_count': [], 'clicked': []}
         self._simulation_data_units = {'intensity': r" $(W/m^2)$"}#, 'photon_count': r' $(counts)$', 'clicked': r' $(boolean)$'}
 
-    def reset_data(self):
-        """SinglePhotonDetector reset_data method""" 
-        # Value reset  
-        self.intensity = 0
-        self.photon_count = 0
-        self.clicked = False
-
-        return super().reset_data()
-
-    def reset(self, save_simulation: bool = False):
-        """SinglePhotonDetector reset method"""        
-        return super().reset(save_simulation)
-
     def simulate(self, electric_field: np.complexfloating):
         """SinglePhotonDetector simulate method"""
         #return super().simulate(args)

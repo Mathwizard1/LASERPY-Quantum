@@ -26,12 +26,6 @@ class CurrentDriver(TimeComponent):
         self._modulation_function = None
         """Modulation_function for CurrentDriver"""
 
-    def reset(self, args=None):
-        """CurrentDriver reset method"""
-        #return super().reset(args)
-        
-        self._data = 0.0
-
     def set(self,modulation_OFF:ArbitaryWave|tuple[ArbitaryWave,...], modulation_ON:ArbitaryWave|tuple[ArbitaryWave,...]|None=None, modulation_function: ArbitaryWave|None=None):
         """CurrentDriver set method"""
         #return super().set()

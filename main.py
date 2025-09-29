@@ -98,9 +98,55 @@ slave_laser = Laser(name= "slave_laser")
 simulator_clock = Clock(dt)
 simulator_clock.set(t_final)
 
-AMZI = AsymmetricMachZehnderInterferometer(simulator_clock, time_delay= t_unit)
+simulator = Simulator(simulator_clock)
+
+simulator.set((
+    Connection(simulator_clock, (current_driver1, current_driver2)),
+    Connection(current_driver1, master_laser),
+    Connection(current_driver2, slave_laser),
+))
+
+simulator.reset(True)
+
+simulator.simulate()
+time_data = simulator.get_data()
+#master_laser.display_data(time_data)
+slave_laser.display_data(time_data)
+
+############################################################################
+
+modulation_bits = [0,0,0,0,0,0,0,0,0,0]
+t_final = t_unit * len(modulation_bits)
+
+simulator.reset_data()
+simulator_clock.set(t_final)
+
+slave_laser.set_master_Laser(master_laser)
 
 simulator = Simulator(simulator_clock)
+
+simulator.set((
+    Connection(simulator_clock, (current_driver1, current_driver2)),
+    Connection(current_driver1, master_laser),
+    Connection((current_driver2, master_laser), slave_laser),
+))
+
+simulator.reset(True)
+
+simulator.simulate()
+time_data = simulator.get_data()
+#master_laser.display_data(time_data)
+slave_laser.display_data(time_data)
+
+############################################################################
+
+modulation_bits = [0,0,1,0,1,0,1,1,1,0]
+t_final = t_unit * len(modulation_bits)
+
+simulator.reset_data()
+simulator_clock.set(t_final)
+
+AMZI = AsymmetricMachZehnderInterferometer(simulator_clock, time_delay= t_unit)
 
 simulator.set((
     Connection(simulator_clock, (current_driver1, current_driver2)),
@@ -109,27 +155,12 @@ simulator.set((
     Connection(slave_laser, AMZI),
 ))
 
-simulator.simulate()
-
-#time_data = simulator.get_data()
-#master_laser.display_data(time_data)
-#slave_laser.display_data(time_data)
-
-############################################################################
-
 simulator.reset(True)
-
-modulation_bits = [0,0,1,0,1,0,1,1,1,0]
-t_final = t_unit * len(modulation_bits)
-
-simulator_clock.set(t_final, t=0)
-
-slave_laser.set_master_Laser(master_laser)
 
 simulator.simulate()
 time_data = simulator.get_data()
 
-master_laser.display_data(time_data)
+#master_laser.display_data(time_data)
 slave_laser.display_data(time_data)
 
 AMZI.display_SPD_data(time_data)

@@ -17,11 +17,13 @@ class Component:
 
     def reset_data(self):
         """Component reset_data method to override"""
-        print("Component reset_data method")
+        # Empty method
+        pass
 
     def reset(self, args=None):
         """Component reset method to override"""
-        print("Component reset method")
+        # Empty method
+        pass
 
     def set(self):
         """Component set method to override"""
@@ -161,6 +163,7 @@ class DataComponent(Component):
 
     def reset_data(self):
         """DataComponent reset_data method"""
+        print(str(self))
         for key in self._simulation_data:
             self._simulation_data[key].clear()
 

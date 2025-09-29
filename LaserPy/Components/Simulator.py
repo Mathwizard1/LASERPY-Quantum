@@ -85,7 +85,7 @@ class Simulator(DataComponent):
     def reset_data(self):
         """Simulator reset_data method"""
         #return super().reset_data()
-        self._simulation_data.clear()
+        self.reset_time_only()
 
         # Propagate the changes
         for connection in self._connections:
@@ -122,6 +122,11 @@ class Simulator(DataComponent):
             print(f"{self.name} returning single zero-element np array")
             return np.array([0.0])
         return np.array(self._simulation_data)
+
+    def reset_time_only(self):
+        """Simulator reset_time_only method"""
+        self.simulation_clock.reset(set_t0= True)
+        self._simulation_data.clear()
 
     def reset(self, save_simulation: bool = False):
         """Simulator reset method"""

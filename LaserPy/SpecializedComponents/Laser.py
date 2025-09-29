@@ -95,25 +95,6 @@ class Laser(PhysicalComponent):
         dPhi_dt = self._Alpha / 2 * (self._Gamma_cap * self._g * (self.carrier - self._N_transparent) - 1 / self._TAU_P) + self._Fphi_t()
         return dPhi_dt
 
-    def reset_data(self):
-        """Laser reset_data method"""
-        # Value reset
-        self.current = ERR_TOLERANCE
-        self.photon = ERR_TOLERANCE
-        self.carrier = self._N_transparent
-        self._data = EMPTY_FIELD
-        self.phase = ERR_TOLERANCE
-
-        return super().reset_data()
-
-    def reset(self, save_simulation: bool = False):
-        """Laser reset method"""
-        # Remove masters
-        self._slave_locked = False
-        self._master_freq_detuning = 0
-
-        return super().reset(save_simulation)
-
     def set_Noise(self, Fn_t:NoNoise, Fs_t:NoNoise, Fphi_t:NoNoise):
         """Laser set noise method""" 
         self._Fn_t = Fn_t
