@@ -57,10 +57,10 @@ class Mirror(PhaseSample):
     def __init__(self, name: str = "default_mirror"):
         super().__init__(np.pi, name)
 
-    def set(self):
-        """Mirror empty set method"""
+    def set(self, args= ...):
+        """Mirror set method"""
         #return super().set(phase_delay, phase_interval)
-        print("Mirror phase is fixed at 2pi")
+        print("Mirror phase is fixed at pi")
 
 class BeamSplitter(Component):
     """
@@ -71,7 +71,7 @@ class BeamSplitter(Component):
 
         # Field coefficients
         self._t = np.sqrt(splitting_ratio_t)
-        self._r = np.exp(1j * np.pi) * np.sqrt(1 - splitting_ratio_t)
+        self._r = np.exp(0.5j * np.pi) * np.sqrt(1 - splitting_ratio_t)
 
         # Field variables
         self._E_transmitted: np.complexfloating = EMPTY_FIELD
@@ -81,7 +81,7 @@ class BeamSplitter(Component):
         """BeamSplitter reset method"""
         #return super().set()
         self._t = np.sqrt(splitting_ratio_t)
-        self._r = np.exp(1j * np.pi) * np.sqrt(1 - splitting_ratio_t)
+        self._r = np.exp(0.5j * np.pi) * np.sqrt(1 - splitting_ratio_t)
 
     def simulate(self, electric_field: np.complexfloating, electric_field_port2: np.complexfloating = EMPTY_FIELD):
         """BeamSplitter simulate method"""
