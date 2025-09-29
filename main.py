@@ -115,9 +115,6 @@ slave_laser.display_data(time_data)
 
 ############################################################################
 
-modulation_bits = [0,0,0,0,0,0,0,0,0,0]
-t_final = t_unit * len(modulation_bits)
-
 simulator.reset_data()
 simulator_clock.set(t_final)
 
@@ -160,7 +157,7 @@ simulator.reset(True)
 simulator.simulate()
 time_data = simulator.get_data()
 
-#master_laser.display_data(time_data)
+master_laser.display_data(time_data)
 slave_laser.display_data(time_data)
 
 AMZI.display_SPD_data(time_data)
