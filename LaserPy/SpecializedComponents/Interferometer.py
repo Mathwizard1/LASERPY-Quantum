@@ -68,12 +68,20 @@ class AsymmetricMachZehnderInterferometer(Component):
             return True
         return False
 
-    def reset(self, save_simulation: bool = False):
-        """AsymmetricMachZehnderInterferometer reset method"""
-        #return super().reset()
-        pass
+    def reset_data(self):
+        """AsymmetricMachZehnderInterferometer reset_data method"""
+        #return super().reset_data()
+        self._field_buffer.clear()
 
-        #TODO propagate the changes
+        self._SPD0.reset_data()
+        self._SPD1.reset_data()
+
+    def reset(self, save_simulation:bool = False):
+        """AsymmetricMachZehnderInterferometer reset method"""
+        #return super().reset(args)
+        self._save_simulation = save_simulation
+        self._SPD0.reset(save_simulation)
+        self._SPD1.reset(save_simulation)
 
     def set(self, clock: Clock, time_delay: float, 
             splitting_ratio_ti: float = 0.5, splitting_ratio_tf: float = 0.5):

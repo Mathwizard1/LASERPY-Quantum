@@ -15,7 +15,11 @@ class Component:
         """Component __repr__ method to override"""
         return f"Component: {self.name}"
 
-    def reset(self):
+    def reset_data(self):
+        """Component reset_data method to override"""
+        print("Component reset_data method")
+
+    def reset(self, args=None):
         """Component reset method to override"""
         print("Component reset method")
 
@@ -171,8 +175,14 @@ class DataComponent(Component):
         plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
 
         key_tuple = tuple(self._simulation_data_units)
+        
+        # Display fixed tuple of data
         if(simulation_keys):
-            key_tuple = simulation_keys
+            key_list = []
+            for key in simulation_keys:
+                if(key in self._simulation_data_units):
+                    key_list.append(key)
+            key_tuple = tuple(key_list)
 
         max_hf_plots = 1 + (len(key_tuple) >> 1)
         sub_plot_idx = 1
@@ -200,6 +210,15 @@ class DataComponent(Component):
         for key in self._simulation_data:
             data_dict[key] = np.zeros(1) if(val) else np.array(self._simulation_data[key])
         return data_dict
+
+    def get_data_units(self):
+        """DataComponent get_data_units method"""        
+        return dict(self._simulation_data_units)
+
+    def reset(self, save_simulation:bool=False):
+        """DataComponent reset method to override"""
+        #return super().reset()
+        self._save_simulation = save_simulation
 
     def output_port(self, kwargs:dict={}):
         """DataComponent output port method to override"""

@@ -10,7 +10,9 @@ from ..Components.Signal import NoNoise
 
 from ..Constants import UniversalConstants
 from ..Constants import LaserPyConstants
+
 from ..Constants import ERR_TOLERANCE
+from ..Constants import EMPTY_FIELD
 
 class InjectionField(TypedDict):
     """
@@ -58,12 +60,11 @@ class Laser(PhysicalComponent):
         """current data for Laser"""
 
         # Data storage
-        if(save_simulation):
-            self._simulation_data = {'current':[], 'photon':[], 'carrier':[], 'phase':[]}
-            self._simulation_data_units = {'current':r" $(Amp)$", 'photon':r" $(m^{-3})$",
+        self._simulation_data = {'current':[], 'photon':[], 'carrier':[], 'phase':[]}
+        self._simulation_data_units = {'current':r" $(Amp)$", 'photon':r" $(m^{-3})$",
                                            'carrier':r" $(m^{-3})$", 'phase':r" $(rad)$"}
 
-        self._data: np.complexfloating = ERR_TOLERANCE * np.exp(1j * 0)
+        self._data: np.complexfloating = EMPTY_FIELD
         """electric_field data for Laser"""
 
         # Laser class private data
@@ -94,23 +95,24 @@ class Laser(PhysicalComponent):
         dPhi_dt = self._Alpha / 2 * (self._Gamma_cap * self._g * (self.carrier - self._N_transparent) - 1 / self._TAU_P) + self._Fphi_t()
         return dPhi_dt
 
-    def reset(self):
-        """Laser reset method"""
-        #return super().reset()
+    def reset_data(self):
+        """Laser reset_data method"""
+        # Value reset
         self.current = ERR_TOLERANCE
         self.photon = ERR_TOLERANCE
         self.carrier = self._N_transparent
-        self._data = ERR_TOLERANCE * np.exp(1j * 0)
+        self._data = EMPTY_FIELD
         self.phase = ERR_TOLERANCE
 
+        return super().reset_data()
+
+    def reset(self, save_simulation: bool = False):
+        """Laser reset method"""
         # Remove masters
         self._slave_locked = False
         self._master_freq_detuning = 0
 
-    def set(self):
-        """Laser set method"""
-        #return super().set()
-        pass
+        return super().reset(save_simulation)
 
     def set_Noise(self, Fn_t:NoNoise, Fs_t:NoNoise, Fphi_t:NoNoise):
         """Laser set noise method""" 

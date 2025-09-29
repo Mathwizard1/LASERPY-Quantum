@@ -22,6 +22,28 @@ class Connection(TimeComponent):
             output_components = (output_components,)
         self._output_components = output_components
 
+    def reset_data(self):
+        """Connection reset_data method"""
+        # Output devices reset
+        for component in self._output_components:
+            component.reset_data()
+
+        # Input devices reset
+        if(self._input_components):
+            for component in self._input_components:
+                component.reset_data()
+
+    def reset(self, save_simulation: bool):
+        """Connection reset method"""
+        #return super().reset()
+        for component in self._output_components:
+            component.reset(save_simulation)
+
+        # Input devices reset
+        if(self._input_components):
+            for component in self._input_components:
+                component.reset(save_simulation)
+
     def simulate(self, clock: Clock):
         """Connection simulate method"""
         #return super().simulate(clock)
@@ -52,9 +74,8 @@ class Simulator(DataComponent):
         self.simulation_clock = simulation_clock
 
         # Data storage
-        if(self._save_simulation):
-            self._simulation_data: list[float] = []
-            self._simulation_data_units = r" $(s)$"
+        self._simulation_data: list[float] = []
+        self._simulation_data_units = r" $(s)$"
 
     def store_data(self):
         """Simulator store_data method"""
@@ -66,7 +87,9 @@ class Simulator(DataComponent):
         #return super().reset_data()
         self._simulation_data.clear()
 
-        # TODO propagate clear data to all connection components
+        # Propagate the changes
+        for connection in self._connections:
+            connection.reset_data()
 
     def display_data(self):
         """Simulator display_data method"""
@@ -100,6 +123,14 @@ class Simulator(DataComponent):
             return np.array([0.0])
         return np.array(self._simulation_data)
 
+    def reset(self, save_simulation: bool = False):
+        """Simulator reset method"""
+        # Propagate the changes
+        for connection in self._connections:
+            connection.reset(save_simulation)
+
+        return super().reset(save_simulation)
+
     def set(self, connections:Connection|tuple[Connection,...]):
         """Simulator set method"""
         #return super().set()
@@ -107,7 +138,7 @@ class Simulator(DataComponent):
             connections = (connections,)
         self._connections = connections
 
-    def simulate(self, args=None):
+    def simulate(self):
         """Simulator simulate method"""
         #return super().simulate(args)
         while(self.simulation_clock.running):

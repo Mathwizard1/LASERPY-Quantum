@@ -22,12 +22,6 @@ class PhaseSample(Component):
         self._electric_field: np.complexfloating = EMPTY_FIELD
         """electric_field data for PhaseSample"""
 
-    def reset(self):
-        """PhaseSample reset method"""
-        #return super().reset()
-        self._electric_field = EMPTY_FIELD
-        self._phase_interval = FULL_PHASE_INTERVAL
-
     def set(self, phase_delay: float, phase_interval: float|None= None):
         """PhaseSample set method"""
         #return super().set()
