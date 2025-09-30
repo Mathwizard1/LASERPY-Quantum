@@ -5,12 +5,13 @@ from LaserPy import CurrentDriver
 from LaserPy import Laser
 
 from LaserPy import AsymmetricMachZehnderInterferometer
+from LaserPy import display_class_instances_data
 
 # Control Constants (all in SI units)
-modulation_bits = [0] * 10
+modulation_bits = [0] * 20
 dt = 1e-12
 t_unit = 1e-9
-t_final = t_unit * len(modulation_bits)
+t_final = t_unit * len(modulation_bits) / 2
 #sampling_rate = 2 * dt
 
 # Current Constants
@@ -76,8 +77,7 @@ class ModulationFunction(ArbitaryWave):
 
     def WaveSignal(self, t, args):
         if(t <= dt):
-            self.idx += 1
-            self.idx = self.idx % len(modulation_bits)
+            self.idx = (self.idx + 1) % len(modulation_bits)
         return modulation_bits[self.idx] == self.modulation_bit
 
 mod_func = ModulationFunction("modulation_function", t_unit)
@@ -85,7 +85,7 @@ mod_func = ModulationFunction("modulation_function", t_unit)
 ############################################################################
 
 current_driver1 = CurrentDriver(AWG)
-current_driver1.set(mBase, (mBase, mModulation), mod_func)
+current_driver1.set(mBase)
 
 current_driver2 = CurrentDriver(AWG)
 current_driver2.set(sBase)
@@ -109,16 +109,14 @@ simulator.reset(True)
 simulator.simulate()
 time_data = simulator.get_data()
 #master_laser.display_data(time_data)
-slave_laser.display_data(time_data)
+#slave_laser.display_data(time_data)
 
 ############################################################################
 
 simulator.reset_data()
-simulator_clock.set(t_final)
+#simulator.reset_time_only(2 * t_final)
 
 slave_laser.set_master_Laser(master_laser)
-
-simulator = Simulator(simulator_clock)
 
 simulator.set((
     Connection(simulator_clock, (current_driver1, current_driver2)),
@@ -130,16 +128,22 @@ simulator.reset(True)
 
 simulator.simulate()
 time_data = simulator.get_data()
-#master_laser.display_data(time_data)
-slave_laser.display_data(time_data)
 
+#master_laser.display_data(time_data)
+#slave_laser.display_data(time_data)
+
+display_class_instances_data((master_laser, slave_laser), time_data)
+
+exit(code=0)
 ############################################################################
 
-modulation_bits = [0,0,1,0,1,0,1,1,1,0]
+modulation_bits = [0,0,1,0,1,0,1,1,1]
 t_final = t_unit * len(modulation_bits)
 
 simulator.reset_data()
 simulator_clock.set(t_final)
+
+current_driver1.set(mBase, (mBase, mModulation), mod_func)
 
 AMZI = AsymmetricMachZehnderInterferometer(simulator_clock, time_delay= t_unit)
 
@@ -155,7 +159,7 @@ simulator.reset(True)
 simulator.simulate()
 time_data = simulator.get_data()
 
-master_laser.display_data(time_data)
-slave_laser.display_data(time_data)
+#master_laser.display_data(time_data)
+#slave_laser.display_data(time_data)
 
 AMZI.display_SPD_data(time_data)

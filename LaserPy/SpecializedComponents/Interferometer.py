@@ -18,6 +18,8 @@ from ..Constants import FULL_PHASE_INTERVAL
 
 from ..Constants import FIG_WIDTH, FIG_HEIGHT
 
+from ..utils import display_class_instances_data
+
 # TODO multiport
 # Handling multiport SinglePhotonDetector
 # SPD = namedtuple('SPD', ['target_phase', 'SinglePhotonDetector'])
@@ -143,51 +145,17 @@ class AsymmetricMachZehnderInterferometer(Component):
     
     def display_SPD_data(self, time_data:np.ndarray, simulation_keys:tuple[str,...]|None=None):
         """AsymmetricMachZehnderInterferometer display_SPD_data method"""        
-
-        # Get SPD data
-        _SPD_data = self.get_SPD_data()
         
-        # handle cases
-        if(_SPD_data is None):
+        # Handle cases
+        if(self._handle_SPD_data()):
             return
 
-        _SPD_data_units = self._SPD0.get_data_units()
-
-        plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
-
-        key_tuple = tuple(_SPD_data_units)
-
-        # Display fixed tuple of data
-        if(simulation_keys):
-            key_list = []
-            for key in simulation_keys:
-                if(key in _SPD_data_units):
-                    key_list.append(key)
-            key_tuple = tuple(key_list)
-
-        max_hf_plots = 1 + (len(key_tuple) >> 1)
-        sub_plot_idx = 1
-        for key in key_tuple:
-            plt.subplot(max_hf_plots, 2, sub_plot_idx)
-
-            # Dual plot
-            for SPD in _SPD_data:
-                plt.plot(time_data, np.array(_SPD_data[SPD][key]), label=f"{SPD}")
-
-            plt.xlabel(r"Time $(s)$")
-            plt.ylabel(key.capitalize() + _SPD_data_units[key])
-            
-            plt.grid()
-            plt.legend()
-            sub_plot_idx += 1
-
-        plt.tight_layout()
-        plt.show()
+        display_class_instances_data((self._SPD0, self._SPD1), time_data, simulation_keys)
 
     def get_SPD_data(self):
         """AsymmetricMachZehnderInterferometer get_SPD_data method"""
 
-        # handle cases
+        # Handle cases
         if(self._handle_SPD_data()):
             return
 
