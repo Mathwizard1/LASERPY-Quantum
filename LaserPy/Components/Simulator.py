@@ -71,7 +71,7 @@ class Simulator(DataComponent):
     """
     def __init__(self, simulation_clock:Clock, save_simulation:bool=False, name:str="default_simulator"):
         super().__init__(save_simulation, name)
-        self.simulation_clock = simulation_clock
+        self.simulation_clock:Clock = simulation_clock
 
         # Data storage
         self._simulation_data: list[float] = []
@@ -85,8 +85,12 @@ class Simulator(DataComponent):
     def reset_data(self):
         """Simulator reset_data method"""
         #return super().reset_data()
-        self.reset_time_only()
+        # Clock reset
+        self.simulation_clock.running = True
+        self.simulation_clock.t = 0.0
 
+        # Data reset
+        self._simulation_data.clear()
         # Propagate the changes
         for connection in self._connections:
             connection.reset_data()
@@ -123,10 +127,9 @@ class Simulator(DataComponent):
             return np.array([0.0])
         return np.array(self._simulation_data)
 
-    def reset_time_only(self):
+    def reset_time_only(self, t_final:float, t:float|None=None):
         """Simulator reset_time_only method"""
-        self.simulation_clock.reset(set_t0= True)
-        self._simulation_data.clear()
+        self.simulation_clock.set(t_final, t)
 
     def reset(self, save_simulation: bool = False):
         """Simulator reset method"""

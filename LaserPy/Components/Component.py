@@ -59,28 +59,22 @@ class Clock(Component):
         self.dt = dt
         """Clock Delta time data"""
 
-        self.t = 0
+        self.t = 0.0
         """Clock time data"""
 
         self.running = True
         """Clock running state data"""
 
-        self._t_final = 0
+        self._t_final = 0.0
         """Clock final time data"""
-
-    def reset(self, set_t0:bool=False):
-        """Clock reset method"""
-        #return super().reset()
-        if(set_t0):
-            self.t = 0
-        self.running = True
 
     def set(self, t_final:float, t:float|None=None):
         """Clock set method"""
         #return super().set()
         self._t_final = t_final
-        if(t):
+        if(isinstance(t, float)):
             self.t = t
+        self.running = True
 
     def update(self):
         """Clock update method"""
