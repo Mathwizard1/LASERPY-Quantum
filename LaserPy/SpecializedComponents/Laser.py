@@ -92,7 +92,7 @@ class Laser(PhysicalComponent):
 
     def _dPhi_dt(self):
         """Delta phase method"""
-        dPhi_dt = self._Alpha / 2 * (self._Gamma_cap * self._g * (self.carrier - self._N_transparent) - 1 / self._TAU_P) + self._Fphi_t()
+        dPhi_dt = (self._Alpha / 2) * (self._Gamma_cap * self._g * (self.carrier - self._N_transparent) - 1 / self._TAU_P) + self._Fphi_t()
         return dPhi_dt
 
     def _power(self):

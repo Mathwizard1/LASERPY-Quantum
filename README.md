@@ -1,7 +1,6 @@
 # LaserPy
 
-A high-level Python library designed for the theoretical simulation of laser systems in quantum communication and cryptographic protocols.
-LaserPy provides an intuitive interface for simulating complex laser interactions, current drivers, and interferometer setups, with plans to offload performance-critical components to Rust for high-speed numerical computations.
+**LaserPy** provides an intuitive interface for simulating complex laser interactions, current drivers, and interferometer setups, with plans to offload performance-critical components to Rust for high-speed numerical computations. A high-level Python library designed for the theoretical simulation of laser systems in quantum communication and cryptographic protocols.
 
 ### 🚀 Features
 
@@ -17,7 +16,7 @@ LaserPy provides an intuitive interface for simulating complex laser interaction
 Currently, LaserPy is under active development and not yet on PyPI.
 - Clone the repository locally:
 
-```
+```bash
 git clone https://github.com/Mathwizard1/LaserPy.git
 cd LaserPy
 pip install -e .
@@ -29,7 +28,7 @@ Ensure you’re using Python 3.9+.
 
 Below is an example of using LaserPy component and connection system with simulator:
 
-```
+```python
 from LaserPy import Clock, PhysicalComponent
 from LaserPy import Connection, Simulator
 
@@ -53,9 +52,9 @@ physical_device1.display_data(time_data)
 physical_device2.display_data(time_data)
 ```
 
-### 🧠 Use Case: Quantum Protocol Simulation
+### 🧠 Use Case: Laser simulations
 
-LaserPy’s current use case is simulating quantum key distribution (QKD) protocols using master–slave lasers with injection locking and interferometer-based detection.
+LaserPy’s current use case is simulating quantum key distribution (QKD) protocols using master–slave lasers with injection locking and interferometer-based detection.<br>
 It allows researchers and engineers to prototype and test theoretical setups before implementing them in hardware.
 
 ### 🔧 Planned Features
@@ -65,7 +64,7 @@ It allows researchers and engineers to prototype and test theoretical setups bef
 
 ### 🤝 Contributing
 
-We welcome contributions!
+We welcome contributions!<br>
 Feel free to fork the repo, open issues, or submit pull requests.
 
 ### 📜 License
@@ -74,5 +73,5 @@ This project is currently copyrighted. ©2025
 
 ### 📬 Contact
 
-Maintained by Anshurup Gupta.\
+Maintained by Anshurup Gupta.<br>
 For questions or collaborations, open an issue or [email](mailto:anshurup.gupta@gmail.com).
