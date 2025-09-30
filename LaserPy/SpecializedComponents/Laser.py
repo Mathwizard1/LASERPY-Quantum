@@ -95,6 +95,10 @@ class Laser(PhysicalComponent):
         dPhi_dt = self._Alpha / 2 * (self._Gamma_cap * self._g * (self.carrier - self._N_transparent) - 1 / self._TAU_P) + self._Fphi_t()
         return dPhi_dt
 
+    def _power(self):
+        """Laser _power method""" 
+        return self.photon * self._Laser_Vol * self._Eta * UniversalConstants.H.value * self._free_running_freq / (2 * self._Gamma_cap * self._TAU_P)
+
     def set_noise(self, Fn_t:NoNoise, Fs_t:NoNoise, Fphi_t:NoNoise):
         """Laser set noise method""" 
         self._Fn_t = Fn_t
@@ -137,8 +141,7 @@ class Laser(PhysicalComponent):
         self.photon = max(self.photon, ERR_TOLERANCE)
 
         # Optical field
-        # TODO correct it
-        self._data = np.sqrt(self.photon) * np.exp(1j * self.phase)
+        self._data = np.sqrt(self._power()) * np.exp(1j * self.phase)
 
         if(self._save_simulation):
             self.store_data()
