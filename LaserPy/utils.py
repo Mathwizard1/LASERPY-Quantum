@@ -50,6 +50,7 @@ def display_class_instances_data(class_instances: tuple[DataComponent,...], time
         plt.legend()
         sub_plot_idx += 1
 
+    plt.suptitle(f"data of {class_type.__name__}s")
     plt.tight_layout()
     plt.show()
         
