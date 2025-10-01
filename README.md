@@ -62,6 +62,15 @@ It allows researchers and engineers to prototype and test theoretical setups bef
 - Rust-based backend for high-performance simulation.
 - Expanded library of optical components (modulators, detectors, etc.).
 
+#### TODO list
+1) Rust based critical parts off-loading
+2) Optical Regulator Components (VOA, Opt Circulator / Isolator)
+3) Component behaviour refinement
+4) More components
+> - TODO multiport interferometer
+> - TODO SPD photon count and clicked
+> - TODO PhaseSensitive SPD
+
 ### 🤝 Contributing
 
 We welcome contributions!<br>
