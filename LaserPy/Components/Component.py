@@ -14,9 +14,17 @@ class Component:
         self.name = name
         """Component name data"""
 
+        # Component save simulation state to override
+        self._save_simulation: bool = False
+
     def __repr__(self) -> str:
         """Component __repr__ method to override"""
         return f"Component: {self.name}"
+
+    def store_data(self):
+        """Component store_data method to override"""
+        # Empty method
+        pass
 
     def reset_data(self):
         """Component reset_data method to override"""
@@ -31,10 +39,6 @@ class Component:
     def set(self):
         """Component set method to override"""
         print("Component set method")
-
-    def update(self):
-        """Component update method to override"""
-        print("Component update method")
 
     def simulate(self, args=None):
         """Component simulate method to override"""
@@ -155,8 +159,7 @@ class DataComponent(Component):
     def store_data(self):
         """DataComponent store_data method"""
         for key in self._simulation_data:
-            if hasattr(self, key):
-                self._simulation_data[key].append(getattr(self, key))
+            self._simulation_data[key].append(getattr(self, key))
 
     def reset_data(self):
         """DataComponent reset_data method"""

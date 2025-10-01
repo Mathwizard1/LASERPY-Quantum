@@ -29,14 +29,10 @@ class SinglePhotonDetector(DataComponent):
         """SinglePhotonDetector simulate method"""
         #return super().simulate(args)
         
-
         self.intensity = np.square(np.abs(electric_field))
 
         # TODO implement clicked
         # TODO implement photon count
-
-        if(self._save_simulation):
-            self.store_data()
 
     def input_port(self):
         """SinglePhotonDetector input port method"""

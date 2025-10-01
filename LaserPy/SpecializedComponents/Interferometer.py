@@ -16,8 +16,6 @@ from .SimpleDevices import BeamSplitter
 from ..Constants import EMPTY_FIELD
 from ..Constants import FULL_PHASE_INTERVAL
 
-from ..Constants import FIG_WIDTH, FIG_HEIGHT
-
 from ..utils import display_class_instances_data
 
 # TODO multiport
@@ -69,6 +67,11 @@ class AsymmetricMachZehnderInterferometer(Component):
             print(f"{self.name} cannot get SPD data")
             return True
         return False
+
+    def store_data(self):
+        """AsymmetricMachZehnderInterferometer store_data method"""
+        self._SPD0.store_data()
+        self._SPD1.store_data()
 
     def reset_data(self):
         """AsymmetricMachZehnderInterferometer reset_data method"""

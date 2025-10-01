@@ -65,6 +65,9 @@ class Connection(TimeComponent):
         for idx, component in enumerate(self._output_components):
             component.simulate(**component_kwargs[idx])
 
+            if(component._save_simulation):
+                component.store_data()
+
 class Simulator(DataComponent):
     """
     Simulator class

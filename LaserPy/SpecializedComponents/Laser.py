@@ -143,9 +143,6 @@ class Laser(PhysicalComponent):
         # Optical field
         self._data = np.sqrt(self._power()) * np.exp(1j * self.phase)
 
-        if(self._save_simulation):
-            self.store_data()
-
     def input_port(self):
         """Laser input port method""" 
         #return super().input_port()
