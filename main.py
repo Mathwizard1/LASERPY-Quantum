@@ -108,8 +108,8 @@ simulator.reset(True)
 
 simulator.simulate()
 time_data = simulator.get_data()
-#master_laser.display_data(time_data)
-#slave_laser.display_data(time_data)
+master_laser.display_data(time_data)
+slave_laser.display_data(time_data)
 
 ############################################################################
 
@@ -134,7 +134,7 @@ time_data = simulator.get_data()
 
 display_class_instances_data((master_laser, slave_laser), time_data)
 
-exit(code=0)
+#exit(code=0)
 ############################################################################
 
 modulation_bits = [0,0,1,0,1,0,1,1,1]
