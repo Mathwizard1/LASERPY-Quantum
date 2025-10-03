@@ -1,6 +1,6 @@
 # LaserPy
 
-**LaserPy** provides an intuitive interface for simulating complex laser interactions, current drivers, and interferometer setups, with plans to offload performance-critical components to Rust for high-speed numerical computations. A high-level Python library designed for the theoretical simulation of laser systems in quantum communication and cryptographic protocols.
+**LaserPy** provides an intuitive interface for simulating complex laser interactions, current drivers, and interferometer setups, with plans to offload performance-critical components to Rust for high-speed numerical computations. A *high-level, open-source Python library designed for the theoretical simulation of laser systems* in quantum communication and cryptographic protocols.
 
 ### 🚀 Features
 
@@ -64,8 +64,8 @@ It allows researchers and engineers to prototype and test theoretical setups bef
 
 #### TODO list
 1) Rust based critical parts off-loading
-2) Optical Regulator Components (VOA, Opt Circulator / Isolator)
-3) Component behaviour refinement
+2) Component behaviour refinement
+3) Optical Regulator Components (VOA, Opt Circulator / Isolator)
 4) More components
 > - TODO multiport interferometer
 > - TODO SPD photon count and clicked
@@ -78,7 +78,11 @@ Feel free to fork the repo, open issues, or submit pull requests.
 
 ### 📜 License
 
-This project is currently copyrighted. ©2025
+LaserPy is distributed under a dual-license model to support both the open-source community and commercial applications.
+
+-   **Open Source:** For academic, personal, and open-source projects, LaserPy is licensed under the **GNU General Public License v3.0 (GPLv3)**.
+
+-   **Commercial:** For use in proprietary or commercial software where the terms of *GPLv3 are not suitable*, a separate commercial license is available. Please contact the maintainer to discuss licensing options.
 
 ### 📬 Contact
 
