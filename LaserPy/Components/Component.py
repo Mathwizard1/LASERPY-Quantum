@@ -238,10 +238,13 @@ class PhysicalComponent(DataComponent, TimeComponent):
     def __init__(self, save_simulation:bool=False, name:str="default_physical_component"):
         super().__init__(save_simulation, name)  
 
+        self._data: float = 0.0
+        """PhysicalComponent _data value to override"""
+
         self._simulation_data = {'_data':[]}
         self._simulation_data_units = {'_data':r" $(u)$"}
 
-    def simulate(self, clock: Clock, _data=None):
+    def simulate(self, clock: Clock, _data: float|None=None):
         """PhysicalComponent simulate method to override"""
         #return super().simulate(args)
         if(_data):
