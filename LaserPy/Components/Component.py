@@ -84,7 +84,6 @@ class Clock(Component):
         """Clock update method"""
         #return super().update()
         if(self.t >= self._t_final):
-            print(f"{np.format_float_scientific(self._t_final, precision= 3, exp_digits= 3)} sec has elapsed.")
             self.running = False
             return
         self.t += self.dt

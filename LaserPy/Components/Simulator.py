@@ -149,7 +149,7 @@ class Simulator(DataComponent):
             connections = (connections,)
         self._connections = connections
 
-    def simulate(self):
+    def simulate(self, DEBUG:bool = False):
         """Simulator simulate method"""
         #return super().simulate(args)
         while(self.simulation_clock.running):
@@ -159,4 +159,6 @@ class Simulator(DataComponent):
             if(self._save_simulation):
                 self.store_data()
             self.simulation_clock.update()
-        print("Simulations Complete")
+        if(DEBUG):
+            print(f"{np.format_float_scientific(self.simulation_clock._t_final, precision= 3, exp_digits= 3)} sec has elapsed.")
+            print("Simulations Complete")
