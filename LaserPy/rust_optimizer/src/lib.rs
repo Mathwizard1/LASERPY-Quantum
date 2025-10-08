@@ -1,14 +1,11 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use pyo3::prelude::*;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+mod universal_constants;
+use universal_constants::UniversalConstant;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+/// Main python module entrypoint for rust_utils
+#[pymodule(name= "rust_optimizer")]
+fn rust_optimizer(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<UniversalConstant>()?;
+    Ok(())
 }

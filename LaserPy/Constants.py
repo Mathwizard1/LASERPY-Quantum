@@ -7,6 +7,8 @@ import json
 from numpy import exp
 from numpy import pi, complexfloating
 
+import rust_optimizer
+
 # fixed Scientific Constants
 class UniversalConstants(float, Enum):
     """
@@ -64,3 +66,7 @@ FULL_PHASE_INTERVAL: float = 2 * pi
 
 FIG_WIDTH = 12
 FIG_HEIGHT = 6
+
+if __name__ == "__main__":
+    constants = rust_optimizer.UniversalConstant
+    print(constants.SpeedOfLight.value())        # 299792458.0
