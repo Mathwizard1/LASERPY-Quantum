@@ -1,5 +1,8 @@
 LaserPy/__pycache__/*
 LaserPy/Components/__pycache__/*
 LaserPy/SpecializedComponents/__pycache__/*
+bench/__pycache__/*
 laser dynamics and optical injection lock.pdf
 CVQKD.pdf
+
+LaserPy/rust_optimizer/target/*
