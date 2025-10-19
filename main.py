@@ -111,6 +111,10 @@ time_data = simulator.get_data()
 master_laser.display_data(time_data)
 slave_laser.display_data(time_data)
 
+
+print(master_laser)
+print(slave_laser)
+exit()
 ############################################################################
 
 simulator.reset_data()
@@ -158,7 +162,6 @@ simulator.reset(True)
 
 simulator.simulate()
 time_data = simulator.get_data()
-
 #master_laser.display_data(time_data)
 #slave_laser.display_data(time_data)
 
