@@ -16,4 +16,24 @@ from .SpecializedComponents import AsymmetricMachZehnderInterferometer
 
 from .utils import display_class_instances_data
 
+__all__ = [
+    "Clock",
+    "PhysicalComponent",
+
+    "LangevinNoise",
+    "ArbitaryWave",
+    "ArbitaryWaveGenerator",
+    
+    "Connection",
+    "Simulator",
+
+    "CurrentDriver",
+    "Laser",
+    "AsymmetricMachZehnderInterferometer",
+
+    "display_class_instances_data",
+]
+
 __version__ = '0.0.5'
+__author__ = 'Anshurup Gupta'
+__description__ = 'A high-level, open-source Python library designed for the theoretical simulation of laser systems'
