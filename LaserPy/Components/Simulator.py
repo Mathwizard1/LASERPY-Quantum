@@ -104,7 +104,7 @@ class Simulator(DataComponent):
 
         # Handle cases
         if(self._handle_get_data()):
-            print(f"{self.name} cannot display data")
+            print(f"{self.name} id:{self.class_id} cannot display data")
             return
 
         plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
@@ -126,7 +126,7 @@ class Simulator(DataComponent):
 
         # Handle cases
         if(self._handle_get_data()):
-            print(f"{self.name} returning single zero-element np array")
+            print(f"{self.name} id:{self.class_id} returning single zero-element np array")
             return np.array([0.0])
         return np.array(self._simulation_data)
 

@@ -2,12 +2,23 @@ import numpy as np
 
 from .Component import Clock
 
-class NoNoise:
+from uuid import uuid4
+
+class SignalID:
+    def __init__(self, name:str) -> None:
+        self.name = name
+        self.uid = uuid4()
+
+    def __repr__(self) -> str:
+        """SignalID __repr__ method"""
+        return f"{self.name} id:{self.uid}"
+
+class NoNoise(SignalID):
     """
     NoNoise class
     """
-    def __init__(self, noise_name:str="default_no_noise"):
-        self.noise_name = noise_name
+    def __init__(self, name:str="default_no_noise"):
+        super().__init__(name)
 
     def __call__(self):
         """NoNoise __call__ method to override"""
@@ -17,8 +28,8 @@ class LangevinNoise(NoNoise):
     """
     LangevinNoise class
     """
-    def __init__(self, Mu: int, Std_dev: int, noise_name: str = "default_langevin_noise"):
-        super().__init__(noise_name)
+    def __init__(self, Mu: int, Std_dev: int, name: str = "default_langevin_noise"):
+        super().__init__(name)
 
         self._Mu = Mu
         self._Std_dev = Std_dev
@@ -27,12 +38,12 @@ class LangevinNoise(NoNoise):
         """LangevinNoise __call__ method"""
         return np.random.normal(loc=self._Mu, scale=self._Std_dev)
 
-class ArbitaryWave:
+class ArbitaryWave(SignalID):
     """
     ArbitaryWave class
     """
-    def __init__(self, signal_name:str, t_unit:float|None=None, central_offset:float=0.0, total_spread:float=1.0):
-        self.name = signal_name
+    def __init__(self, name:str, t_unit:float|None=None, central_offset:float=0.0, total_spread:float=1.0):
+        super().__init__(name)
 
         self._t_unit = t_unit
         self._central_offset = central_offset

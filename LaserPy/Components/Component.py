@@ -1,16 +1,41 @@
+from __future__ import annotations
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 from ..Constants import FIG_WIDTH, FIG_HEIGHT
 
-# TODO add unique component id on runtime instance
 # TODO refine reset and reset_data behaviour
 
-class Component:
+class CLASSID:
+    """
+    CLASSID class
+    """
+    ######  Special Component Registry  #######
+    _Component_registry = {}
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls._instances: list[Component] = []
+        cls._Component_registry[cls.__name__] = cls._instances
+
+    def __init__(self):
+        ## Added class_id
+        self.class_id = len(self._instances)
+        self.__class__._instances.append(self) # type: ignore
+
+    # @classmethod
+    # def get_all_Component_registry(cls):
+    #     """get_all_Component_registry method"""
+    #     return dict(CLASSID._Component_registry)
+    ######  ##########################  #######
+
+class Component(CLASSID):
     """
     Component class
     """
     def __init__(self, name:str="default_component"):
+        super().__init__()
         self.name = name
         """Component name data"""
 
@@ -19,7 +44,7 @@ class Component:
 
     def __repr__(self) -> str:
         """Component __repr__ method to override"""
-        return f"Component: {self.name}"
+        return f"Component: {self.name} id:{self.class_id}"
 
     def store_data(self):
         """Component store_data method to override"""
@@ -136,22 +161,22 @@ class DataComponent(Component):
         if(self._handle_get_data()):
             return True
         elif(time_data is None):
-            print(f"{self.name} got None for time_data")
+            print(f"{self.name} id:{self.uid} got None for time_data")
             return True
         else:
             for key in self._simulation_data:
                 if(len(time_data) != len(self._simulation_data[key])):
-                    print(f"{self.name} {key} has {len(self._simulation_data[key])} while time_data has {len(time_data)}")
+                    print(f"{self.name} id:{self.class_id} {key} has {len(self._simulation_data[key])} while time_data has {len(time_data)}")
                     return True
         return False
 
     def _handle_get_data(self):
         """DataComponent _handle_get_data method"""
         if(not self._save_simulation):
-            print(f"{self.name} did not save simulation data")
+            print(f"{self.name} id:{self.class_id} did not save simulation data")
             return True
         elif(len(self._simulation_data) == 0):
-            print(f"{self.name}'s simulation data is empty")
+            print(f"{self.name} id:{self.class_id} simulation data is empty")
             return True
         return False
 
@@ -170,7 +195,7 @@ class DataComponent(Component):
         
         # Handle cases
         if(self._handle_display_data(time_data)):
-            print(f"{self.name} cannot display data")
+            print(f"{self.name}id:{self.class_id} cannot display data")
             return
 
         plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
@@ -198,7 +223,7 @@ class DataComponent(Component):
             plt.legend()
             sub_plot_idx += 1
 
-        plt.suptitle(self.name)
+        plt.suptitle(f"{self.name} {self.__class__.__name__}_id:{self.class_id}")
         plt.tight_layout()
         plt.show()
 
