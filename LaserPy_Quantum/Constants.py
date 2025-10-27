@@ -1,4 +1,4 @@
-"""Constants for LaserPy"""
+"""Constants for LaserPy_Quantum"""
 
 from enum import Enum
 
@@ -12,7 +12,7 @@ from numpy import pi, complexfloating
 # fixed Scientific Constants
 class UniversalConstants(float, Enum):
     """
-    Universal Constants for LaserPy
+    Universal Constants for LaserPy_Quantum
     """
 
     CHARGE = 1.602 * (1.0e-19)
@@ -32,12 +32,12 @@ class UniversalConstants(float, Enum):
 
 class LaserPyConstants:
     """
-    Simulation Constants for LaserPy
+    Simulation Constants for LaserPy_Quantum
     """
     _Constants: dict[str, float] = {}
 
     @classmethod
-    def load_from_json(cls, filepath='./LaserPy/Constants.json'):
+    def load_from_json(cls, filepath='./LaserPy_Qauntum/Constants.json'):
         """Loads constants from a JSON file."""
         try:
             with open(filepath, 'r') as f:

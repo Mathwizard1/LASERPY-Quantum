@@ -1,11 +1,11 @@
 from .benchmark import benchmark
 
 ############################################################################
-from LaserPy import Clock
-from LaserPy import Connection, Simulator
-from LaserPy import ArbitaryWave, ArbitaryWaveGenerator
-from LaserPy import CurrentDriver
-from LaserPy import Laser
+from LaserPy_Quantum import Clock
+from LaserPy_Quantum import Connection, Simulator
+from LaserPy_Quantum import ArbitaryWave, ArbitaryWaveGenerator
+from LaserPy_Quantum import CurrentDriver
+from LaserPy_Quantum import Laser
 
 ############################################################################
 dt = 1e-12

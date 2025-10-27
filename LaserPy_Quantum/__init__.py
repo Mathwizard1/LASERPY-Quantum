@@ -1,4 +1,4 @@
-""" Classes Exposed for LaserPy """
+""" Classes Exposed for LaserPy_Quantum """
 
 from .Components import Clock
 from .Components import PhysicalComponent

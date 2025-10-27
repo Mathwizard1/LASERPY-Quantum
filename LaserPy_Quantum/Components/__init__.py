@@ -1,4 +1,4 @@
-""" Components for LaserPy """
+""" Components for LaserPy_Quantum """
 
 from .Component import Clock
 from .Component import TimeComponent

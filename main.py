@@ -1,11 +1,11 @@
-from LaserPy import Clock
-from LaserPy import Connection, Simulator
-from LaserPy import ArbitaryWave, ArbitaryWaveGenerator
-from LaserPy import CurrentDriver
-from LaserPy import Laser
+from LaserPy_Quantum import Clock
+from LaserPy_Quantum import Connection, Simulator
+from LaserPy_Quantum import ArbitaryWave, ArbitaryWaveGenerator
+from LaserPy_Quantum import CurrentDriver
+from LaserPy_Quantum import Laser
 
-from LaserPy import AsymmetricMachZehnderInterferometer
-from LaserPy import display_class_instances_data
+from LaserPy_Quantum import AsymmetricMachZehnderInterferometer
+from LaserPy_Quantum import display_class_instances_data
 
 # Control Constants (all in SI units)
 modulation_bits = [0] * 20

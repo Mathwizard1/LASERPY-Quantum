@@ -1,4 +1,4 @@
-""" SpecializedComponents for LaserPy """
+""" SpecializedComponents for LaserPy_Quantum """
 
 from .ComponentDriver import CurrentDriver
 

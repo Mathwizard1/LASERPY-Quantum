@@ -1,6 +1,6 @@
-# LaserPy
+# LaserPy_Quantum
 
-**LaserPy** provides an intuitive interface for simulating complex laser interactions, current drivers, and interferometer setups, with plans to offload performance-critical components to Rust for high-speed numerical computations. A *high-level, open-source Python library designed for the theoretical simulation of laser systems* in quantum communication and cryptographic protocols.
+**LaserPy_Quantum** provides an intuitive interface for simulating complex laser interactions, current drivers, and interferometer setups, with plans to offload performance-critical components to Rust for high-speed numerical computations. A *high-level, open-source Python library designed for the theoretical simulation of laser systems* in quantum communication and cryptographic protocols.
 
 ### 🚀 Features
 
@@ -13,12 +13,12 @@
 
 ### 📦 Installation
 
-Currently, LaserPy is under active development and not yet on PyPI.
+Currently, LaserPy_Quantum is under active development and not yet on PyPI.
 - Clone the repository locally:
 
 ```bash
-git clone https://github.com/Mathwizard1/LaserPy.git
-cd LaserPy
+git clone https://github.com/Mathwizard1/LaserPy_Quantum.git
+cd LaserPy_Quantum
 pip install -e .
 ```
 
@@ -26,11 +26,11 @@ Ensure you’re using Python 3.9+.
 
 ### 📝 Example Usage
 
-Below is an example of using LaserPy component and connection system with simulator:
+Below is an example of using LaserPy_Quantum component and connection system with simulator:
 
 ```python
-from LaserPy import Clock, PhysicalComponent
-from LaserPy import Connection, Simulator
+from LaserPy_Quantum import Clock, PhysicalComponent
+from LaserPy_Quantum import Connection, Simulator
 
 simulator_clock = Clock(dt=0.001)
 simulator_clock.set(2)
@@ -54,7 +54,7 @@ physical_device2.display_data(time_data)
 
 ### 🧠 Use Case: Laser simulations
 
-LaserPy’s current use case is simulating quantum key distribution (QKD) protocols using master–slave lasers with injection locking and interferometer-based detection.<br>
+LaserPy_Quantum’s current use case is simulating quantum key distribution (QKD) protocols using master–slave lasers with injection locking and interferometer-based detection.<br>
 It allows researchers and engineers to prototype and test theoretical setups before implementing them in hardware.
 
 ### 🔧 Planned Features
@@ -78,9 +78,9 @@ Feel free to fork the repo, open issues, or submit pull requests.
 
 ### 📜 License
 
-LaserPy is distributed under a dual-license model to support both the open-source community and commercial applications.
+LaserPy_Quantum is distributed under a dual-license model to support both the open-source community and commercial applications.
 
--   **Open Source:** For academic, personal, and open-source projects, LaserPy is licensed under the **GNU General Public License v3.0 (GPLv3)**.
+-   **Open Source:** For academic, personal, and open-source projects, LaserPy_Quantum is licensed under the **GNU General Public License v3.0 (GPLv3)**.
 
 -   **Commercial:** For use in proprietary or commercial software where the terms of *GPLv3 are not suitable*, a separate commercial license is available. Please contact the maintainer to discuss licensing options.
 

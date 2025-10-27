@@ -1,7 +1,7 @@
-from LaserPy import Clock, PhysicalComponent
-from LaserPy import Connection, Simulator
+from LaserPy_Quantum import Clock, PhysicalComponent
+from LaserPy_Quantum import Connection, Simulator
 
-from LaserPy import display_class_instances_data
+from LaserPy_Quantum import display_class_instances_data
 
 simulator_clock = Clock(dt=0.01)
 simulator_clock.set(2)

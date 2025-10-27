@@ -1,4 +1,4 @@
-from LaserPy.Components.Component import Clock
+from LaserPy_Quantum.Components.Component import Clock
 from ..Components.Component import Component
 
 class VariableOpticalAttenuator(Component):
