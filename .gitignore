@@ -6,3 +6,6 @@ laser dynamics and optical injection lock.pdf
 CVQKD.pdf
 
 LaserPy/rust_optimizer/target/*
+
+LaserPy.egg-info/*
+dist/*
