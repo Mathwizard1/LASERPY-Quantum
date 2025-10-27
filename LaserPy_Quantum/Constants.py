@@ -37,7 +37,7 @@ class LaserPyConstants:
     _Constants: dict[str, float] = {}
 
     @classmethod
-    def load_from_json(cls, filepath='./LaserPy_Qauntum/Constants.json'):
+    def load_from_json(cls, filepath='./LaserPy_Quantum/Constants.json'):
         """Loads constants from a JSON file."""
         try:
             with open(filepath, 'r') as f:

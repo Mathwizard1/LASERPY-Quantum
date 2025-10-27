@@ -10,3 +10,4 @@ LaserPy_Quantum/rust_optimizer/target/*
 
 LaserPy.egg-info/*
 dist/*
+LaserPy_Quantum.egg-info/*
