@@ -1,7 +1,9 @@
 from __future__ import annotations
-from typing import TypedDict
 
-import numpy as np
+from numpy import (
+    complexfloating, 
+    sqrt, exp, cos, sin,
+    pi)
 
 from ..Components import Clock
 from ..Components import PhysicalComponent
@@ -14,17 +16,11 @@ from ..Constants import LaserPyConstants
 from ..Constants import ERR_TOLERANCE
 from ..Constants import EMPTY_FIELD
 
-class InjectionField(TypedDict):
-    """
-    InjectionField class\n
-    A dictionary type for {'photon', 'phase'}.
-    """
-    photon: float
-    phase: float
+from ..utils import InjectionField
 
 class Laser(PhysicalComponent):
     """
-    Laser class for simulations
+    Laser class
     """
 
     # Class variables for Laser
@@ -64,7 +60,7 @@ class Laser(PhysicalComponent):
         self._simulation_data_units = {'current':r" $(Amp)$", 'photon':r" $(m^{-3})$",
                                            'carrier':r" $(m^{-3})$", 'phase':r" $(rad)$"}
 
-        self._data: np.complexfloating = EMPTY_FIELD
+        self._data: complexfloating = EMPTY_FIELD
         """electric_field data for Laser"""
 
         # Laser class private data
@@ -105,12 +101,11 @@ class Laser(PhysicalComponent):
         self._Fs_t = Fs_t
         self._Fphi_t = Fphi_t
 
-    def set_master_Laser(self, master_Laser:Laser):
+    def set_slave_Laser(self, slave_locked: bool = True):
         """Laser set master laser method""" 
-        self._slave_locked = True
-        self._master_freq_detuning = self._free_running_freq - master_Laser._free_running_freq
+        self._slave_locked = slave_locked
 
-    def simulate(self, clock: Clock, current: float, injection_field: InjectionField|None = None):
+    def simulate(self, clock: Clock, current: float, injection_field: InjectionField|tuple[InjectionField,...]|None = None):
         """Laser simulate method"""
         #return super().simulate(clock, _data)
 
@@ -124,12 +119,24 @@ class Laser(PhysicalComponent):
 
         # Injection_field equations
         if(self._slave_locked and injection_field):
-            # Phase difference between master and slave output
-            delta_phase = self.phase - injection_field['phase']
+            if(isinstance(injection_field, tuple)):
+                # Multi Master laser lock
+                for single_field in injection_field:
+                    # Phase difference between master and slave output
+                    delta_phase = self.phase - single_field['phase']
+                    self._master_freq_detuning = 2 * pi * (self._free_running_freq - single_field['frequency']) * clock.t
 
-            # Injection terms effects
-            dS_dt += 2 * self._Kappa * np.sqrt(injection_field['photon'] * self.photon) * np.cos(delta_phase - self._master_freq_detuning * clock.t)
-            dPhi_dt -= self._Kappa * np.sqrt(injection_field['photon'] / self.photon) * np.sin(delta_phase - self._master_freq_detuning * clock.t)
+                    # Injection terms effects
+                    dS_dt += 2 * self._Kappa * sqrt(single_field['photon'] * self.photon) * cos(delta_phase - self._master_freq_detuning)
+                    dPhi_dt -= self._Kappa * sqrt(single_field['photon'] / self.photon) * sin(delta_phase - self._master_freq_detuning)
+            else:
+                # Phase difference between master and slave output
+                delta_phase = self.phase - injection_field['phase']
+                self._master_freq_detuning = 2 * pi * (self._free_running_freq - injection_field['frequency']) * clock.t
+
+                # Injection terms effects
+                dS_dt += 2 * self._Kappa * sqrt(injection_field['photon'] * self.photon) * cos(delta_phase - self._master_freq_detuning)
+                dPhi_dt -= self._Kappa * sqrt(injection_field['photon'] / self.photon) * sin(delta_phase - self._master_freq_detuning)
 
         # Time step update (Euler Integration)
         self.carrier += dN_dt * clock.dt
@@ -141,7 +148,7 @@ class Laser(PhysicalComponent):
         self.photon = max(self.photon, ERR_TOLERANCE)
 
         # Optical field
-        self._data = np.sqrt(self._power()) * np.exp(1j * self.phase)
+        self._data = sqrt(self._power()) * exp(1j * self.phase)
 
     def input_port(self):
         """Laser input port method""" 
@@ -153,7 +160,8 @@ class Laser(PhysicalComponent):
         """Laser output port method""" 
         #return super().output_port(kwargs)
         if('injection_field' in kwargs):
-            kwargs['injection_field'] = {'photon': self.photon, 'phase': self.phase}
+            kwargs['injection_field'] = {'photon': self.photon, 'phase': self.phase, 
+                                         'electric_field': self._data, 'frequency': self._free_running_freq}
         elif('electric_field' in kwargs):
             kwargs['electric_field'] = self._data
         return kwargs

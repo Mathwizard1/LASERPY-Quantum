@@ -13,9 +13,12 @@
 
 ### 📦 Installation
 
-Currently, LaserPy_Quantum is under active development and not yet on PyPI.
-- Clone the repository locally:
+- LaserPy_Quantum is now on *PyPI*.
+```bash
+pip install LaserPy-Quantum
+```
 
+- Also, LaserPy_Quantum is under active development and welcomes opensource developers. Clone the repository locally:
 ```bash
 git clone https://github.com/Mathwizard1/LaserPy_Quantum.git
 cd LaserPy_Quantum

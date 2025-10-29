@@ -108,19 +108,18 @@ simulator.reset(True)
 
 simulator.simulate()
 time_data = simulator.get_data()
-master_laser.display_data(time_data)
-slave_laser.display_data(time_data)
+#master_laser.display_data(time_data)
+#slave_laser.display_data(time_data)
 
 
 print(master_laser)
 print(slave_laser)
-exit()
 ############################################################################
 
 simulator.reset_data()
 #simulator.reset_time_only(2 * t_final)
 
-slave_laser.set_master_Laser(master_laser)
+slave_laser.set_slave_Laser()
 
 simulator.set((
     Connection(simulator_clock, (current_driver1, current_driver2)),

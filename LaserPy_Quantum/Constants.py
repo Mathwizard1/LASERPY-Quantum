@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+from importlib import resources
 import json
 
 from numpy import exp
@@ -37,10 +38,10 @@ class LaserPyConstants:
     _Constants: dict[str, float] = {}
 
     @classmethod
-    def load_from_json(cls, filepath='./LaserPy_Quantum/Constants.json'):
+    def load_from_json(cls, filepath=r'Constants.json'):
         """Loads constants from a JSON file."""
         try:
-            with open(filepath, 'r') as f:
+            with resources.open_text("LaserPy_Quantum", filepath) as f:
                 cls._Constants = json.load(f)
         except FileNotFoundError:
             print(f"Error: The file '{filepath}' was not found.")

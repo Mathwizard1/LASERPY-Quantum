@@ -12,6 +12,9 @@ class Connection(TimeComponent):
     """
     Connection class
     """
+    _input_components: tuple[Component,...] | None
+    _output_components: tuple[Component,...]
+
     def __init__(self, input_components:Component|tuple[Component,...]|None, output_components:Component|tuple[Component,...], name:str="default_connection"):
         super().__init__(name)
         if(isinstance(input_components, Component)):
@@ -149,16 +152,19 @@ class Simulator(DataComponent):
             connections = (connections,)
         self._connections = connections
 
-    def simulate(self, DEBUG:bool = False):
+    def simulate(self):
         """Simulator simulate method"""
         #return super().simulate(args)
         while(self.simulation_clock.running):
-            for connection in self._connections:
-                    connection.simulate(self.simulation_clock)
-            
-            if(self._save_simulation):
-                self.store_data()
+            try:
+                for connection in self._connections:
+                        connection.simulate(self.simulation_clock)
+
+                if(self._save_simulation):
+                    self.store_data()
+            except Exception as e:
+                # Handle any unexpected exceptions
+                print(f"An unexpected error occurred: {e}")
+                return
             self.simulation_clock.update()
-        if(DEBUG):
-            print(f"{np.format_float_scientific(self.simulation_clock._t_final, precision= 3, exp_digits= 3)} sec has elapsed.")
-            print("Simulations Complete")
+        print("Simulations Complete")

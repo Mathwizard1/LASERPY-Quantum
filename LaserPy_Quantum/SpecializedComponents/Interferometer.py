@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-import matplotlib.pyplot as plt
-import numpy as np
+from numpy import (
+    complexfloating,
+    ndarray
+)
 
 from ..Components.Component import Component
 from ..Components import Clock
@@ -48,15 +50,15 @@ class AsymmetricMachZehnderInterferometer(Component):
         self._SPD0 = SinglePhotonDetector(self._save_simulation, name=f"SPD_0")
         self._SPD1 = SinglePhotonDetector(self._save_simulation, name=f"SPD_1")
 
-        self._electric_field: np.complexfloating = EMPTY_FIELD
+        self._electric_field: complexfloating = EMPTY_FIELD
         """electric_field data for AsymmetricMachZehnderInterferometer"""
 
-        self._electric_field_port2: np.complexfloating = EMPTY_FIELD
+        self._electric_field_port2: complexfloating = EMPTY_FIELD
         """electric_field_port2 data for AsymmetricMachZehnderInterferometer"""
 
         # Delay buffer
         self._buffer_size: int = max(1, int(time_delay / clock.dt))
-        self._field_buffer: list[np.complexfloating] = []
+        self._field_buffer: list[complexfloating] = []
 
     def _handle_SPD_data(self):
         """AsymmetricMachZehnderInterferometer _handle_SPD_data method"""
@@ -107,7 +109,7 @@ class AsymmetricMachZehnderInterferometer(Component):
         self._short_arm_phase_sample.set(short_arm_phase, phase_interval= short_arm_phase_interval)
         self._long_arm_phase_sample.set(long_arm_phase, phase_interval= long_arm_phase_interval)
 
-    def simulate(self, electric_field: np.complexfloating):
+    def simulate(self, electric_field: complexfloating):
         """AsymmetricMachZehnderInterferometer simulate method"""
         #return super().simulate(clock)
 
@@ -146,7 +148,7 @@ class AsymmetricMachZehnderInterferometer(Component):
         kwargs['electric_field_port2'] = self._electric_field_port2
         return kwargs
     
-    def display_SPD_data(self, time_data:np.ndarray, simulation_keys:tuple[str,...]|None=None):
+    def display_SPD_data(self, time_data: ndarray, simulation_keys:tuple[str,...]|None=None):
         """AsymmetricMachZehnderInterferometer display_SPD_data method"""        
         
         # Handle cases

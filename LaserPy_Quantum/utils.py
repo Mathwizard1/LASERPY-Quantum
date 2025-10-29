@@ -1,9 +1,20 @@
+from typing import TypedDict
 import matplotlib.pyplot as plt
 import numpy as np
 
 from .Components import DataComponent
 
 from .Constants import FIG_WIDTH, FIG_HEIGHT
+
+class InjectionField(TypedDict):
+    """
+    InjectionField class\n
+    A dictionary type for {'photon', 'phase', 'electric_field', 'frequency'}.
+    """
+    photon: float
+    phase: float
+    electric_field: np.complexfloating
+    frequency: float
 
 def display_class_instances_data(class_instances: tuple[DataComponent,...], time_data:np.ndarray, simulation_keys:tuple[str,...]|None=None):
     """display merged graph for comparision of same class members data"""
