@@ -12,6 +12,7 @@ from .Components import Simulator
 
 from .SpecializedComponents import CurrentDriver
 from .SpecializedComponents import Laser
+from .SpecializedComponents import VariableOpticalAttenuator
 from .SpecializedComponents import AsymmetricMachZehnderInterferometer
 
 from .utils import display_class_instances_data
@@ -29,6 +30,7 @@ __all__ = [
 
     "CurrentDriver",
     "Laser",
+    "VariableOpticalAttenuator",
     "AsymmetricMachZehnderInterferometer",
 
     "display_class_instances_data",

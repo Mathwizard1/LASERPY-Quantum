@@ -68,11 +68,11 @@ It allows researchers and engineers to prototype and test theoretical setups bef
 #### TODO list
 1) Rust based critical parts off-loading
 2) Component behaviour refinement
-3) Optical Regulator Components (VOA, Opt Circulator / Isolator)
-4) More components
+3) More components
 > - TODO multiport interferometer
 > - TODO SPD photon count and clicked
 > - TODO PhaseSensitive SPD
+4) GUI
 
 ### 🤝 Contributing
 

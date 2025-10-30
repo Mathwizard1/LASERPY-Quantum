@@ -4,6 +4,8 @@ from LaserPy_Quantum import ArbitaryWave, ArbitaryWaveGenerator
 from LaserPy_Quantum import CurrentDriver
 from LaserPy_Quantum import Laser
 
+from LaserPy_Quantum.SpecializedComponents import OpticalCirculator
+
 from LaserPy_Quantum import AsymmetricMachZehnderInterferometer
 from LaserPy_Quantum import display_class_instances_data
 
@@ -153,8 +155,9 @@ AMZI = AsymmetricMachZehnderInterferometer(simulator_clock, time_delay= t_unit)
 simulator.set((
     Connection(simulator_clock, (current_driver1, current_driver2)),
     Connection(current_driver1, master_laser),
-    Connection((current_driver2, master_laser), slave_laser),
-    Connection(slave_laser, AMZI),
+    #Connection((current_driver2, master_laser), slave_laser),
+    #Connection(slave_laser, AMZI),
+    OpticalCirculator(master_laser, (current_driver2, slave_laser), AMZI)
 ))
 
 simulator.reset(True)
@@ -164,4 +167,5 @@ time_data = simulator.get_data()
 #master_laser.display_data(time_data)
 #slave_laser.display_data(time_data)
 
+display_class_instances_data((master_laser, slave_laser), time_data)
 AMZI.display_SPD_data(time_data)
