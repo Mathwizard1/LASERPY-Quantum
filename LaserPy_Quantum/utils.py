@@ -1,4 +1,5 @@
-from typing import TypedDict
+from typing import TypedDict, NamedTuple
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -65,4 +66,14 @@ def display_class_instances_data(class_instances: tuple[DataComponent,...], time
     plt.tight_layout()
     plt.show()
         
-    
+########## Circulator Dependency Resolved ##########
+from .SpecializedComponents import CurrentDriver
+from .SpecializedComponents import Laser
+
+class LaserRunnerComponents(NamedTuple):
+    """
+    LaserRunnerComponents class\n
+    A compact class for {'current_driver', 'laser'}.
+    """
+    current_driver: CurrentDriver
+    laser: Laser

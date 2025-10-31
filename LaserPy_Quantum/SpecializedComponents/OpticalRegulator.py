@@ -10,7 +10,10 @@ from .Laser import Laser
 
 from ..Constants import EMPTY_FIELD
 
-from ..utils import InjectionField
+from ..utils import (
+    InjectionField,
+    LaserRunnerComponents
+)
 
 class VariableOpticalAttenuator(Component):
     """
@@ -54,16 +57,19 @@ class OpticalCirculator(Connection):
     # Specific type override
     _input_components: tuple[Laser,...]
 
-    def __init__(self, input_components: Laser | tuple[Laser, ...], injection_components: tuple[CurrentDriver, Laser], output_components: Component|tuple[Component, ...], name: str = "default_optical_circulator"):
+    def __init__(self, input_components: Laser | tuple[Laser, ...], injection_components: LaserRunnerComponents | tuple[CurrentDriver, Laser], output_components: Component|tuple[Component, ...], name: str = "default_optical_circulator"):
         if(isinstance(input_components, Laser)):
             input_components = (input_components,)
         self._input_components = input_components
         """Master Lasers for OpticalCirculator"""
 
-        self._injection_laser_driver = injection_components[0]
+        if(isinstance(injection_components, tuple)):
+            injection_components = LaserRunnerComponents._make(injection_components)
+
+        self._injection_laser_driver = injection_components.current_driver
         """Slave Laser's Driver for OpticalCirculator"""
 
-        self._injection_laser = injection_components[1]
+        self._injection_laser = injection_components.laser
         self._injection_laser.set_slave_Laser(True)
         """Slave locked Laser for OpticalCirculator"""
         
