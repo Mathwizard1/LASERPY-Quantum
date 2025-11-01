@@ -42,13 +42,13 @@ class AsymmetricMachZehnderInterferometer(Component):
         self._output_beam_joiner = BeamSplitter(splitting_ratio_tf, name="output_beam_joiner")
 
         # Phase controls
-        self._mirror = Mirror(name=f"common_mirror")
+        self._mirror = Mirror(name="common_mirror")
         self._short_arm_phase_sample = PhaseSample(name="short_arm_phase_sample")
         self._long_arm_phase_sample = PhaseSample(name="long_arm_phase_sample")
 
         # Measure ports
-        self._SPD0 = SinglePhotonDetector(self._save_simulation, name=f"SPD_0")
-        self._SPD1 = SinglePhotonDetector(self._save_simulation, name=f"SPD_1")
+        self._SPD0 = SinglePhotonDetector(self._save_simulation, name="SPD_0")
+        self._SPD1 = SinglePhotonDetector(self._save_simulation, name="SPD_1")
 
         self._electric_field: complexfloating = EMPTY_FIELD
         """electric_field data for AsymmetricMachZehnderInterferometer"""

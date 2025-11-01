@@ -276,11 +276,7 @@ class PhysicalComponent(DataComponent, TimeComponent):
         else:
             self._data = 100 * np.exp(-clock.t)
 
-        if(self._save_simulation):
-            self.store_data()
-
     def input_port(self):
         """PhysicalComponent input port method to override"""
-        kwargs = super().input_port() 
-        kwargs['_data'] = None
+        kwargs = {'clock':None, '_data': None}
         return kwargs
