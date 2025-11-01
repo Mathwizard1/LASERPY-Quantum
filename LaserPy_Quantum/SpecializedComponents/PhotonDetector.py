@@ -25,6 +25,12 @@ class SinglePhotonDetector(DataComponent):
         self._simulation_data = {'intensity': []}#, 'photon_count': [], 'clicked': []}
         self._simulation_data_units = {'intensity': r" $(W/m^2)$"}#, 'photon_count': r' $(counts)$', 'clicked': r' $(boolean)$'}
 
+    def display_data(self, time_data: np.ndarray, simulation_keys: tuple[str, ...] | None = None):
+        """SinglePhotonDetector simulate method"""
+        # Time adjustment
+        time_data = time_data[-len(self._simulation_data['intensity']):]
+        super().display_data(time_data, simulation_keys)
+
     def simulate(self, electric_field: np.complexfloating):
         """SinglePhotonDetector simulate method"""
         #return super().simulate(args)

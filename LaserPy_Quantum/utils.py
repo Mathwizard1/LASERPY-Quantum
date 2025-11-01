@@ -48,6 +48,9 @@ def display_class_instances_data(class_instances: tuple[DataComponent,...], time
     max_hf_plots = 1 + (len(key_tuple) >> 1)
     sub_plot_idx = 1
 
+    # Time adjustment
+    time_data = time_data[-len(_class_data[str(class_instances[0])][key_tuple[0]]):]
+
     # Key plot
     for key in key_tuple:
         plt.subplot(max_hf_plots, 2, sub_plot_idx)

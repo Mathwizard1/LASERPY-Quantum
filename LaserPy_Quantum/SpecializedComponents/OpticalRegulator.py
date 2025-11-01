@@ -49,43 +49,43 @@ class VariableOpticalAttenuator(Component):
         kwargs['electric_field'] = self._output_field
         return kwargs
     
-class OpticalCirculator(Connection):
-    """
-    OpticalCirculator class
-    """
+# class OpticalCirculator(Connection):
+#     """
+#     OpticalCirculator class
+#     """
 
-    # Specific type override
-    _input_components: tuple[Laser,...]
+#     # Specific type override
+#     _input_components: tuple[Laser,...]
 
-    def __init__(self, input_components: Laser | tuple[Laser, ...], injection_components: LaserRunnerComponents | tuple[CurrentDriver, Laser], output_components: Component|tuple[Component, ...], name: str = "default_optical_circulator"):
-        if(isinstance(input_components, Laser)):
-            input_components = (input_components,)
-        self._input_components = input_components
-        """Master Lasers for OpticalCirculator"""
+#     def __init__(self, input_components: Laser | tuple[Laser, ...], injection_components: LaserRunnerComponents | tuple[CurrentDriver, Laser], output_components: Component|tuple[Component, ...], name: str = "default_optical_circulator"):
+#         if(isinstance(input_components, Laser)):
+#             input_components = (input_components,)
+#         self._input_components = input_components
+#         """Master Lasers for OpticalCirculator"""
 
-        if(isinstance(injection_components, tuple)):
-            injection_components = LaserRunnerComponents._make(injection_components)
+#         if(isinstance(injection_components, tuple)):
+#             injection_components = LaserRunnerComponents._make(injection_components)
 
-        self._injection_laser_driver = injection_components.current_driver
-        """Slave Laser's Driver for OpticalCirculator"""
+#         self._injection_laser_driver = injection_components.current_driver
+#         """Slave Laser's Driver for OpticalCirculator"""
 
-        self._injection_laser = injection_components.laser
-        self._injection_laser.set_slave_Laser(True)
-        """Slave locked Laser for OpticalCirculator"""
+#         self._injection_laser = injection_components.laser
+#         self._injection_laser.set_slave_Laser(True)
+#         """Slave locked Laser for OpticalCirculator"""
         
-        super().__init__(self._injection_laser, output_components, name)
+#         super().__init__(self._injection_laser, output_components, name)
 
-    def simulate(self, clock: Clock):
-        """OpticalCirculator simulate method"""
-        # Injection devices
-        injection_kwargs: list[InjectionField] = []
-        for laser in (self._input_components):
-            injection_kwargs.append(laser.output_port({'injection_field': None})['injection_field'])
+#     def simulate(self, clock: Clock):
+#         """OpticalCirculator simulate method"""
+#         # Injection devices
+#         injection_kwargs: list[InjectionField] = []
+#         for laser in (self._input_components):
+#             injection_kwargs.append(laser.output_port({'injection_field': None})['injection_field'])
 
-        # Multi Master locked Slave Laser simulation
-        self._injection_laser.simulate(clock, self._injection_laser_driver._data, tuple(injection_kwargs))
-        if(self._injection_laser._save_simulation):
-            self._injection_laser.store_data()
+#         # Multi Master locked Slave Laser simulation
+#         self._injection_laser.simulate(clock, self._injection_laser_driver._data, tuple(injection_kwargs))
+#         if(self._injection_laser._save_simulation):
+#             self._injection_laser.store_data()
 
-        # Simulate devices dependent on Slave laser data
-        super().simulate(clock)
+#         # Simulate devices dependent on Slave laser data
+#         super().simulate(clock)

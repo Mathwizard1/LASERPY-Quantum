@@ -133,10 +133,6 @@ class Simulator(DataComponent):
             return np.array([0.0])
         return np.array(self._simulation_data)
 
-    def reset_time_only(self, t_final:float, t:float|None=None):
-        """Simulator reset_time_only method"""
-        self.simulation_clock.set(t_final, t)
-
     def reset(self, save_simulation: bool = False):
         """Simulator reset method"""
         # Propagate the changes

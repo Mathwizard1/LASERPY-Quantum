@@ -4,8 +4,6 @@ from LaserPy_Quantum import ArbitaryWave, ArbitaryWaveGenerator
 from LaserPy_Quantum import CurrentDriver
 from LaserPy_Quantum import Laser
 
-from LaserPy_Quantum.SpecializedComponents import OpticalCirculator
-
 from LaserPy_Quantum import AsymmetricMachZehnderInterferometer
 from LaserPy_Quantum import display_class_instances_data
 
@@ -100,6 +98,8 @@ simulator_clock.set(t_final)
 
 simulator = Simulator(simulator_clock)
 
+AMZI = AsymmetricMachZehnderInterferometer(simulator_clock, time_delay= t_unit)
+
 simulator.set((
     Connection(simulator_clock, (current_driver1, current_driver2)),
     Connection(current_driver1, master_laser),
@@ -111,13 +111,15 @@ simulator.reset(True)
 simulator.simulate()
 time_data = simulator.get_data()
 
+#master_laser.display_data(time_data)
+#slave_laser.display_data(time_data)
+
 display_class_instances_data((master_laser, slave_laser), time_data)
 
-#exit(code=0)
+#exit(code= 0)
 ############################################################################
-
-simulator.reset_data()
-#simulator.reset_time_only(2 * t_final)
+t_final = 2 * t_final
+simulator_clock.set(t_final)
 
 slave_laser.set_slave_Laser()
 
@@ -134,30 +136,24 @@ time_data = simulator.get_data()
 
 display_class_instances_data((master_laser, slave_laser), time_data)
 
-#exit(code=0)
-############################################################################
+#exit(code= 0)
+############################################################################\
 
-#modulation_bits = [0,0,1,0,1,0,1,1,1]
-t_final = t_unit * len(modulation_bits)
+modulation_bits = [0,0,1,0,1,0,1,1,1]
 
-#simulator.reset_data()
+t_final += t_unit * len(modulation_bits)
 simulator_clock.set(t_final)
 
+# simulator.reset_data()
+
+
 current_driver1.set(mBase, (mBase, mModulation), mod_func)
-
-AMZI = AsymmetricMachZehnderInterferometer(simulator_clock, time_delay= t_unit)
-
-# simulator.set((
-#     Connection(simulator_clock, (current_driver1, current_driver2)),
-#     Connection(current_driver1, master_laser),
-#     Connection((current_driver2, master_laser), slave_laser),
-#     Connection(slave_laser, AMZI),
-# ))
 
 simulator.set((
     Connection(simulator_clock, (current_driver1, current_driver2)),
     Connection(current_driver1, master_laser),
-    OpticalCirculator(master_laser, (current_driver2, slave_laser), AMZI)
+    Connection((current_driver2, master_laser), slave_laser),
+    Connection(slave_laser, AMZI),
 ))
 
 simulator.reset(True)

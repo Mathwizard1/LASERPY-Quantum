@@ -7,7 +7,7 @@ from .Interferometer import AsymmetricMachZehnderInterferometer
 from .Laser import Laser
 
 from .OpticalRegulator import VariableOpticalAttenuator
-from .OpticalRegulator import OpticalCirculator
+# from .OpticalRegulator import OpticalCirculator
 
 from .PhotonDetector import SinglePhotonDetector
 from .PhotonDetector import PhaseSensitiveSPD
@@ -23,7 +23,7 @@ __all__ = [
     "Laser",
 
     "VariableOpticalAttenuator",
-    "OpticalCirculator",
+    #"OpticalCirculator",
 
     "SinglePhotonDetector",
     "PhaseSensitiveSPD",

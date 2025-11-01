@@ -36,6 +36,6 @@ __all__ = [
     "display_class_instances_data",
 ]
 
-__version__ = '0.0.6'
+__version__ = '0.0.65'
 __author__ = 'Anshurup Gupta'
 __description__ = 'A high-level, open-source Python library designed for the theoretical simulation of laser systems'
