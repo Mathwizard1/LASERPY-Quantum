@@ -5,8 +5,11 @@ from enum import Enum
 from importlib import resources
 import json
 
-from numpy import exp
-from numpy import pi, complexfloating
+from numpy import (
+    complexfloating,
+    exp,
+    pi
+)
 
 #import rust_optimizer
 

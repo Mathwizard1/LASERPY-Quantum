@@ -22,7 +22,6 @@ from ..utils import display_class_instances_data
 
 # TODO multiport
 # Handling multiport SinglePhotonDetector
-# SPD = namedtuple('SPD', ['target_phase', 'SinglePhotonDetector'])
 
 class AsymmetricMachZehnderInterferometer(Component):
     """
