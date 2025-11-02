@@ -6,7 +6,12 @@ from .Component import DataComponent
 from .Component import PhysicalComponent
 
 from .Signal import LangevinNoise
-from .Signal import ArbitaryWave
+from .Signal import (
+    ArbitaryWave,
+    StaticWave,
+    PulseWave,
+    AlternatingPulseWave
+)
 from .Signal import ArbitaryWaveGenerator
 
 from .Simulator import Connection
@@ -20,6 +25,9 @@ __all__ = [
 
     "LangevinNoise",
     "ArbitaryWave",
+    "StaticWave",
+    "PulseWave",
+    "AlternatingPulseWave",
     "ArbitaryWaveGenerator",
     
     "Connection",

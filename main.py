@@ -1,6 +1,10 @@
 from LaserPy_Quantum import Clock
 from LaserPy_Quantum import Connection, Simulator
-from LaserPy_Quantum import ArbitaryWave, ArbitaryWaveGenerator
+from LaserPy_Quantum import (
+    ArbitaryWave,
+    StaticWave, PulseWave, AlternatingPulseWave,
+    ArbitaryWaveGenerator
+)
 from LaserPy_Quantum import CurrentDriver
 from LaserPy_Quantum import Laser
 
@@ -12,7 +16,7 @@ modulation_bits = [0] * 20
 dt = 1e-12
 t_unit = 1e-9
 t_final = t_unit * len(modulation_bits) / 2
-#sampling_rate = 2 * dt
+sampling_rate = 50
 
 # Current Constants
 I_th = 0.0178
@@ -29,53 +33,25 @@ SLAVE_DC = 0.85 * I_th
 SLAVE_PULSE = 1.15 * I_th
 
 # Steady above lasing current
-class master_Base_signal(ArbitaryWave):
-    def __init__(self, signal_name: str, t_unit: float | None = None, central_offset: float = 0, total_spread: float = 1):
-        super().__init__(signal_name, t_unit, central_offset, total_spread)
-
-    def WaveSignal(self, t, args):
-        return MASTER_BASE_DC
-
-mBase = master_Base_signal("mBase", t_unit)
+mBase = StaticWave("mBase", MASTER_BASE_DC)
 
 # Modulation current
-class master_Modulation_signal(ArbitaryWave):
-    def __init__(self, signal_name: str, t_unit: float | None = None, central_offset: float = 0, total_spread: float = 1):
-        super().__init__(signal_name, t_unit, central_offset, total_spread)
-        self.sign = 1
+mModulation = AlternatingPulseWave("mModulation", 0, MASTER_AC, t_unit, total_spread=MASTER_AC_DURATION)
 
-    def WaveSignal(self, t, args):
-        if(t <= dt):
-            self.sign *= -1
-        elif(t > self._t_unit * (0.5 - self._signal_spread) and t < self._t_unit * (0.5 + self._signal_spread)): # type: ignore
-            return MASTER_AC * self.sign
-        return super().WaveSignal(t, args)
-
-mModulation = master_Modulation_signal("mModulation", t_unit, total_spread=MASTER_AC_DURATION)
-
-# Pulse below lasing and above lasing current
-class slave_Base_signal(ArbitaryWave):
-    def __init__(self, signal_name: str, t_unit: float | None = None, central_offset: float = 0, total_spread: float = 1):
-        super().__init__(signal_name, t_unit, central_offset, total_spread)
-
-    def WaveSignal(self, t, args):
-        if(t > self._t_unit * (0.5 - self._signal_spread) and t < self._t_unit * (0.5 + self._signal_spread)): # type: ignore
-            return SLAVE_DC
-        return SLAVE_PULSE
-
-sBase = slave_Base_signal("sBase", t_unit, total_spread=SLAVE_DC_DURATION)
+# Gain Switch mode for slave laser
+sBase = PulseWave("sBase", SLAVE_PULSE, SLAVE_DC, t_unit, total_spread=SLAVE_DC_DURATION) 
 
 AWG = ArbitaryWaveGenerator()
 AWG.set((mBase, mModulation))
 AWG.set(sBase)
 
 class ModulationFunction(ArbitaryWave):
-    def __init__(self, signal_name: str, t_unit: float | None = None, central_offset: float = 0, total_spread: float = 1):
-        super().__init__(signal_name, t_unit, central_offset, total_spread)
+    def __init__(self, signal_name: str, t_unit: float, total_spread: float = 1):
+        super().__init__(signal_name, t_unit, total_spread)
         self.idx = 0
         self.modulation_bit = 1
 
-    def WaveSignal(self, t, args):
+    def WaveSignal(self, t):
         if(t <= dt):
             self.idx = (self.idx + 1) % len(modulation_bits)
         return modulation_bits[self.idx] == self.modulation_bit
@@ -93,7 +69,7 @@ current_driver2.set(sBase)
 master_laser = Laser(name= "master_laser")
 slave_laser = Laser(name= "slave_laser")
 
-simulator_clock = Clock(dt)
+simulator_clock = Clock(dt, sampling_rate)
 simulator_clock.set(t_final)
 
 simulator = Simulator(simulator_clock)
@@ -111,10 +87,10 @@ simulator.reset(True)
 simulator.simulate()
 time_data = simulator.get_data()
 
-#master_laser.display_data(time_data)
-#slave_laser.display_data(time_data)
+# master_laser.display_data(time_data)
+# slave_laser.display_data(time_data)
 
-display_class_instances_data((master_laser, slave_laser), time_data)
+#display_class_instances_data((master_laser, slave_laser), time_data)
 
 #exit(code= 0)
 ############################################################################
@@ -137,9 +113,9 @@ time_data = simulator.get_data()
 display_class_instances_data((master_laser, slave_laser), time_data)
 
 #exit(code= 0)
-############################################################################\
+############################################################################
 
-modulation_bits = [0,0,1,0,1,0,1,1,1]
+modulation_bits = [0,0,0,0,0,0,0,0,0]
 
 t_final += t_unit * len(modulation_bits)
 simulator_clock.set(t_final)

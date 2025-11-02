@@ -4,7 +4,12 @@ from .Components import Clock
 from .Components import PhysicalComponent
 
 from .Components import LangevinNoise
-from .Components import ArbitaryWave
+from .Components import (
+    ArbitaryWave,
+    StaticWave,
+    PulseWave,
+    AlternatingPulseWave
+)
 from .Components import ArbitaryWaveGenerator
 
 from .Components import Connection
@@ -23,6 +28,9 @@ __all__ = [
 
     "LangevinNoise",
     "ArbitaryWave",
+    "StaticWave",
+    "PulseWave",
+    "AlternatingPulseWave",
     "ArbitaryWaveGenerator",
     
     "Connection",
@@ -36,6 +44,6 @@ __all__ = [
     "display_class_instances_data",
 ]
 
-__version__ = '0.0.65'
+__version__ = '0.0.7'
 __author__ = 'Anshurup Gupta'
 __description__ = 'A high-level, open-source Python library designed for the theoretical simulation of laser systems'
