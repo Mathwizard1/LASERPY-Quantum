@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
-import numpy as np
+
+from numpy import (
+    array
+)
 
 from ..Constants import FIG_WIDTH, FIG_HEIGHT
 
@@ -68,7 +71,7 @@ class Connection(TimeComponent):
         for idx, component in enumerate(self._output_components):
             component.simulate(**component_kwargs[idx])
 
-            if(component._save_simulation):
+            if(component._save_simulation and clock._should_sample()):
                 component.store_data()
 
 class Simulator(DataComponent):
@@ -112,7 +115,7 @@ class Simulator(DataComponent):
 
         plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
 
-        time_data = np.array(self._simulation_data)
+        time_data = array(self._simulation_data)
 
         plt.plot(time_data, time_data, label="Time")
         plt.xlabel(self._simulation_data_units)
@@ -130,8 +133,8 @@ class Simulator(DataComponent):
         # Handle cases
         if(self._handle_get_data()):
             print(f"{self.name} id:{self.class_id} returning single zero-element np array")
-            return np.array([0.0])
-        return np.array(self._simulation_data)
+            return array([0.0])
+        return array(self._simulation_data)
 
     def reset(self, save_simulation: bool = False):
         """Simulator reset method"""
@@ -156,11 +159,11 @@ class Simulator(DataComponent):
                 for connection in self._connections:
                         connection.simulate(self.simulation_clock)
 
-                if(self._save_simulation):
+                if(self._save_simulation and self.simulation_clock._should_sample()):
                     self.store_data()
             except Exception as e:
                 # Handle any unexpected exceptions
-                print(f"An unexpected error occurred: {e}")
+                print(f"DEBUG:: An unexpected error occurred: {e}")
                 return
             self.simulation_clock.update()
         print("Simulations Complete")

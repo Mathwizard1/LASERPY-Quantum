@@ -83,13 +83,19 @@ class Clock(Component):
     """
     Clock class
     """
-    def __init__(self, dt:float, name:str="default_clock"):
+    def __init__(self, dt:float, sampling_rate:int = -1, name:str="default_clock"):
         super().__init__(name)
         self.dt = dt
         """Clock Delta time data"""
 
+        self._sampling_rate = dt * (sampling_rate if(sampling_rate > 0) else 1)
+        """Clock sampling rate"""
+
         self.t = 0.0
         """Clock time data"""
+
+        self._t_sample = 0.0
+        """Clock sample time data"""
 
         self.running = True
         """Clock running state data"""
@@ -101,8 +107,9 @@ class Clock(Component):
         """Clock set method"""
         #return super().set()
         self._t_final = t_final
-        if(isinstance(t, float)):
+        if(t): 
             self.t = t
+            self._t_sample = 0.0
         self.running = True
 
     def update(self):
@@ -112,6 +119,12 @@ class Clock(Component):
             self.running = False
             return
         self.t += self.dt
+        self._t_sample += self.dt
+        if(self._t_sample >= self._sampling_rate): self._t_sample = 0.0
+
+    def _should_sample(self) -> bool:
+        """Clock _should_sample method"""
+        return (self._t_sample == 0.0)
 
     def output_port(self, kwargs: dict = {}):
         """Clock output_port method"""
@@ -161,7 +174,7 @@ class DataComponent(Component):
         if(self._handle_get_data()):
             return True
         elif(time_data is None):
-            print(f"{self.name} id:{self.uid} got None for time_data")
+            print(f"{self.name} id:{self.class_id} got None for time_data")
             return True
         else:
             for key in self._simulation_data:
