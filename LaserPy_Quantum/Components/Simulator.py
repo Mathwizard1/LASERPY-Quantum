@@ -166,4 +166,4 @@ class Simulator(DataComponent):
                 print(f"DEBUG:: An unexpected error occurred: {e}")
                 return
             self.simulation_clock.update()
-        print("Simulations Complete")
+        print(f"Simulations Complete: {len(self._simulation_data)} samples")

@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from numpy import (
     complexfloating,
-    ndarray
+    ndarray,
+    pi
 )
 
 from ..Components.Component import Component
 from ..Components import Clock
 
-from .PhotonDetector import SinglePhotonDetector
+from .PhotonDetector import PhaseSensitiveSPD
 
 #from collections import namedtuple
 
@@ -46,8 +47,8 @@ class AsymmetricMachZehnderInterferometer(Component):
         self._long_arm_phase_sample = PhaseSample(name="long_arm_phase_sample")
 
         # Measure ports
-        self._SPD0 = SinglePhotonDetector(self._save_simulation, name="SPD_0")
-        self._SPD1 = SinglePhotonDetector(self._save_simulation, name="SPD_1")
+        self._SPD0 = PhaseSensitiveSPD(save_simulation=self._save_simulation, name="SPD_0")
+        self._SPD1 = PhaseSensitiveSPD(target_phase= pi, save_simulation=self._save_simulation, name="SPD_1")
 
         self._electric_field: complexfloating = EMPTY_FIELD
         """electric_field data for AsymmetricMachZehnderInterferometer"""

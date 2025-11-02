@@ -124,7 +124,7 @@ class AlternatingPulseWave(ArbitaryWave):
 
 class ArbitaryWaveGenerator:
     """
-    ArbitaryWaveGenerator class
+    ArbitaryWaveGenerator Singleton class
     """
     _SELF = None
     _SINGLETON = False

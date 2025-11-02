@@ -1,14 +1,17 @@
 import numpy as np
 
-from ..Components import Clock
 from ..Components import DataComponent
 
-from ..Constants import FULL_PHASE_INTERVAL
+from ..Constants import LaserPyConstants
 
 class SinglePhotonDetector(DataComponent):
     """
     SinglePhotonDetector class
     """
+
+    # Class variables for SinglePhotonDetector
+    _Eta = LaserPyConstants.get("Eta")
+
     def __init__(self, save_simulation: bool = False, name: str = "default_single_photon_detector"):
         super().__init__(save_simulation, name)
 
@@ -17,13 +20,10 @@ class SinglePhotonDetector(DataComponent):
 
         self.photon_count = 0
         """photon count data for SinglePhotonDetector"""
-    
-        self.clicked: int = 0
-        """clicked data for SinglePhotonDetector"""
 
         # Data storage
-        self._simulation_data = {'intensity': []}#, 'photon_count': [], 'clicked': []}
-        self._simulation_data_units = {'intensity': r" $(W/m^2)$"}#, 'photon_count': r' $(counts)$', 'clicked': r' $(boolean)$'}
+        self._simulation_data = {'intensity': [], 'photon_count': []}
+        self._simulation_data_units = {'intensity': r" $(W/m^2)$", 'photon_count': r" $(counts)$"}
 
     def display_data(self, time_data: np.ndarray, simulation_keys: tuple[str, ...] | None = None):
         """SinglePhotonDetector simulate method"""
@@ -37,8 +37,9 @@ class SinglePhotonDetector(DataComponent):
         
         self.intensity = np.square(np.abs(electric_field))
 
-        # TODO implement clicked
-        # TODO implement photon count
+        # Total photon count
+        incident_photons = np.random.poisson(self.intensity)
+        self.photon_count = np.random.binomial(incident_photons, self._Eta)
 
     def input_port(self):
         """SinglePhotonDetector input port method"""
@@ -51,25 +52,21 @@ class PhaseSensitiveSPD(SinglePhotonDetector):
     """
     PhaseSensitiveSPD class
     """
-    def __init__(self, target_phase: float = 0.0, phase_tolerance: float = 0.1, save_simulation: bool = False, name: str = "default_phase_sensitive_SPD"):
+    def __init__(self, target_phase: float = 0.0, save_simulation: bool = False, name: str = "default_phase_sensitive_spd"):
         super().__init__(save_simulation, name)
 
         self._target_phase = target_phase
         """target phase data for PhaseSensitiveSPD"""
 
-        self._phase_tolerance = phase_tolerance
-        """phase error data for PhaseSensitiveSPD"""
-
-    def set(self, target_phase: float = 0.0, phase_tolerance: float = 0.1):
-        """PhaseSensitiveSPD set method"""
-        #return super().set()
-        self._target_phase = target_phase
-        self._phase_tolerance = phase_tolerance
-
     def simulate(self, electric_field: np.complexfloating):
         """PhaseSensitiveSPD simulate method"""
-        #return super().simulate(args)
+        #return super().simulate(electric_field)
 
+        # phase shift due to target phase
+        target_phase_norm = np.mod(self._target_phase, 2 * np.pi) - np.pi
+        phase_shift = np.exp(-1j * target_phase_norm)
 
-        if(self._save_simulation):
-            self.store_data()
+        # Apply target phase to check interference
+        effective_field = electric_field * phase_shift
+        
+        super().simulate(effective_field)

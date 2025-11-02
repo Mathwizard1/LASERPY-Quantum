@@ -77,8 +77,7 @@ It allows researchers and engineers to prototype and test theoretical setups bef
 2) Component behaviour refinement
 3) More components
 > - TODO multiport interferometer
-> - TODO SPD photon count and clicked
-> - TODO PhaseSensitive SPD
+> - TODO PhotonDetector behaviour refinement
 4) GUI
 
 ### 🤝 Contributing

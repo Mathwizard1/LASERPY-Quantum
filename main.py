@@ -16,7 +16,7 @@ modulation_bits = [0] * 20
 dt = 1e-12
 t_unit = 1e-9
 t_final = t_unit * len(modulation_bits) / 2
-sampling_rate = 50
+sampling_rate = 10
 
 # Current Constants
 I_th = 0.0178
@@ -110,12 +110,12 @@ simulator.reset(True)
 simulator.simulate()
 time_data = simulator.get_data()
 
-display_class_instances_data((master_laser, slave_laser), time_data)
+#display_class_instances_data((master_laser, slave_laser), time_data)
 
 #exit(code= 0)
 ############################################################################
 
-modulation_bits = [0,0,0,0,0,0,0,0,0]
+modulation_bits = [1,0,1,0,1,1,0,0,0,1]
 
 t_final += t_unit * len(modulation_bits)
 simulator_clock.set(t_final)
@@ -139,5 +139,5 @@ time_data = simulator.get_data()
 #master_laser.display_data(time_data)
 #slave_laser.display_data(time_data)
 
-display_class_instances_data((master_laser, slave_laser), time_data)
+#display_class_instances_data((master_laser, slave_laser), time_data)
 AMZI.display_SPD_data(time_data)
