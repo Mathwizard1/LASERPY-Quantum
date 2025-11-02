@@ -28,7 +28,7 @@ def benchmark(number: int = 1, repeat: int = 5, beta= 0.9):
                 timer = timeit.default_timer
                 
                 start = timer()
-                for i in range(number):
+                for _ in range(number):
                     result = func(*args, **kwargs) # Execute the original function
                 end = timer()
 
