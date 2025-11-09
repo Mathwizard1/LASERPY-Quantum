@@ -28,7 +28,7 @@ class AsymmetricMachZehnderInterferometer(Component):
     AsymmetricMachZehnderInterferometer class
     """
     def __init__(self, clock:Clock, time_delay:float, 
-                 splitting_ratio_ti:float = 0.5, splitting_ratio_tf:float = 0.5,
+                splitting_ratio_ti:float = 0.5, splitting_ratio_tf:float = 0.5,
                 save_simulation: bool = False, name: str = "default_asymmetric_machzehnder_interferometer"):
         super().__init__(name)
 
@@ -132,8 +132,8 @@ class AsymmetricMachZehnderInterferometer(Component):
         self._electric_field, self._electric_field_port2 = self._output_beam_joiner.simulate(E_short, E_long)
 
         # Photon Detection
-        self._SPD0.simulate(self._electric_field)
-        self._SPD1.simulate(self._electric_field_port2)
+        self._SPD0.simulate(self._electric_field_port2)
+        self._SPD1.simulate(self._electric_field)
 
     def input_port(self):
         """AsymmetricMachZehnderInterferometer input port method"""

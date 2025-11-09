@@ -1,8 +1,12 @@
 from typing import TypedDict, NamedTuple
 
 import matplotlib.pyplot as plt
-import numpy as np
-
+from numpy import (
+    complexfloating,
+    ndarray,
+    array, mod, sqrt,
+    pi
+)
 from .Components import DataComponent
 
 from .Constants import FIG_WIDTH, FIG_HEIGHT
@@ -14,10 +18,10 @@ class InjectionField(TypedDict):
     """
     photon: float
     phase: float
-    electric_field: np.complexfloating
+    electric_field: complexfloating
     frequency: float
 
-def display_class_instances_data(class_instances: tuple[DataComponent,...], time_data:np.ndarray, simulation_keys:tuple[str,...]|None=None):
+def display_class_instances_data(class_instances: tuple[DataComponent,...], time_data: ndarray, simulation_keys:tuple[str,...]|None=None):
     """display merged graph for comparision of same class members data"""
     class_type = type(class_instances[0])
     
@@ -57,7 +61,7 @@ def display_class_instances_data(class_instances: tuple[DataComponent,...], time
 
         # Component plot
         for instance in _class_data:
-            plt.plot(time_data, np.array(_class_data[instance][key]), label=str(instance))
+            plt.plot(time_data, array(_class_data[instance][key]), label=str(instance))
         plt.xlabel(r"Time $(s)$")
         plt.ylabel(key.capitalize() + _class_data_units[key])
         
@@ -80,3 +84,29 @@ class LaserRunnerComponents(NamedTuple):
     """
     current_driver: CurrentDriver
     laser: Laser
+
+def display_laser_field(laser: Laser):
+    """display complex laser field with relative phase"""
+    plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT)) # Create a figure for the plot
+    plt.suptitle(f"Field of {laser}")
+    
+    # Magnitude and Phase plot
+    laser_data = laser.get_data()
+    for p, key in enumerate(("photon", "phase")):
+        plt.subplot(1, 2, p + 1)
+        if(key == 'photon'):
+            plt.plot(sqrt(laser_data[key]))
+            plt.ylabel("Magnitude of electric_field")
+        elif(key == 'phase'):
+            phase_angle = mod(laser_data[key], 2 * pi) - pi
+            plt.plot(phase_angle)
+            plt.ylabel("Phase of electric_field")
+        plt.grid()
+
+    plt.tight_layout()
+    plt.show()
+
+def get_time_delay_phase_correction(laser: Laser, time_delay: float):
+    """calculate and return the phase correction for given time_delay"""
+    phase_correction:float = mod(2 * pi * laser._free_running_freq * time_delay, 2 * pi) - pi
+    return phase_correction

@@ -1,12 +1,14 @@
 from numpy import (
+    random,
     complexfloating, ndarray,
-    square, abs, mod, exp,
+    square, abs, mod, exp, cos, angle,
     pi
 )
 
 from ..Components import DataComponent
 
 from ..Constants import LaserPyConstants
+from ..Constants import ERR_TOLERANCE
 
 class SinglePhotonDetector(DataComponent):
     """
@@ -51,7 +53,6 @@ class SinglePhotonDetector(DataComponent):
         kwargs = {'electric_field': None}
         return kwargs
 
-# TODO phasesensitiveSPD
 class PhaseSensitiveSPD(SinglePhotonDetector):
     """
     PhaseSensitiveSPD class
