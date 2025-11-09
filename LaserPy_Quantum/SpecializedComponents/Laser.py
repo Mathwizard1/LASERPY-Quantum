@@ -3,7 +3,8 @@ from __future__ import annotations
 from numpy import (
     complexfloating, 
     sqrt, exp, cos, sin,
-    pi)
+    pi
+)
 
 from ..Components import Clock
 from ..Components import PhysicalComponent
@@ -74,7 +75,6 @@ class Laser(PhysicalComponent):
 
         # Optical Injection locking data
         self._slave_locked: bool = False
-        self._master_freq_detuning: float = 0
 
     def _dN_dt(self):
         """Delta number of carrier method"""
@@ -124,19 +124,19 @@ class Laser(PhysicalComponent):
                 for single_field in injection_field:
                     # Phase difference between master and slave output
                     delta_phase = self.phase - single_field['phase']
-                    self._master_freq_detuning = 2 * pi * (self._free_running_freq - single_field['frequency']) * clock.t
+                    _master_freq_detuning = 2 * pi * (self._free_running_freq - single_field['frequency']) * clock.t
 
                     # Injection terms effects
-                    dS_dt += 2 * self._Kappa * sqrt(single_field['photon'] * self.photon) * cos(delta_phase - self._master_freq_detuning)
-                    dPhi_dt -= self._Kappa * sqrt(single_field['photon'] / self.photon) * sin(delta_phase - self._master_freq_detuning)
+                    dS_dt += 2 * self._Kappa * sqrt(single_field['photon'] * self.photon) * cos(delta_phase - _master_freq_detuning)
+                    dPhi_dt -= self._Kappa * sqrt(single_field['photon'] / self.photon) * sin(delta_phase - _master_freq_detuning)
             else:
                 # Phase difference between master and slave output
                 delta_phase = self.phase - injection_field['phase']
-                self._master_freq_detuning = 2 * pi * (self._free_running_freq - injection_field['frequency']) * clock.t
+                _master_freq_detuning = 2 * pi * (self._free_running_freq - injection_field['frequency']) * clock.t
 
                 # Injection terms effects
-                dS_dt += 2 * self._Kappa * sqrt(injection_field['photon'] * self.photon) * cos(delta_phase - self._master_freq_detuning)
-                dPhi_dt -= self._Kappa * sqrt(injection_field['photon'] / self.photon) * sin(delta_phase - self._master_freq_detuning)
+                dS_dt += 2 * self._Kappa * sqrt(injection_field['photon'] * self.photon) * cos(delta_phase - _master_freq_detuning)
+                dPhi_dt -= self._Kappa * sqrt(injection_field['photon'] / self.photon) * sin(delta_phase - _master_freq_detuning)
 
         # Time step update (Euler Integration)
         self.carrier += dN_dt * clock.dt

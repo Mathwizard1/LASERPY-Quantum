@@ -9,15 +9,14 @@ from numpy import (
 from ..Components.Component import Component
 from ..Components import Clock
 
-from .PhotonDetector import PhaseSensitiveSPD
+from .PhotonDetector import SinglePhotonDetector
 
 #from collections import namedtuple
 
-from .SimpleDevices import PhaseSample, Mirror
+from .SimpleDevices import PhaseSample
 from .SimpleDevices import BeamSplitter
 
 from ..Constants import EMPTY_FIELD
-from ..Constants import FULL_PHASE_INTERVAL
 
 from ..utils import display_class_instances_data
 
@@ -42,13 +41,12 @@ class AsymmetricMachZehnderInterferometer(Component):
         self._output_beam_joiner = BeamSplitter(splitting_ratio_tf, name="output_beam_joiner")
 
         # Phase controls
-        self._mirror = Mirror(name="common_mirror")
         self._short_arm_phase_sample = PhaseSample(name="short_arm_phase_sample")
         self._long_arm_phase_sample = PhaseSample(name="long_arm_phase_sample")
 
         # Measure ports
-        self._SPD0 = PhaseSensitiveSPD(save_simulation=self._save_simulation, name="SPD_0")
-        self._SPD1 = PhaseSensitiveSPD(target_phase= pi, save_simulation=self._save_simulation, name="SPD_1")
+        self._SPD0 = SinglePhotonDetector(save_simulation=self._save_simulation, name="SPD_0")
+        self._SPD1 = SinglePhotonDetector(save_simulation=self._save_simulation, name="SPD_π")
 
         self._electric_field: complexfloating = EMPTY_FIELD
         """electric_field data for AsymmetricMachZehnderInterferometer"""
@@ -103,11 +101,15 @@ class AsymmetricMachZehnderInterferometer(Component):
         self._buffer_size = max(1, int(time_delay / clock.dt))
         self._field_buffer.clear()
 
-    def set_phases(self, short_arm_phase: float, long_arm_phase: float, 
-                short_arm_phase_interval: float = FULL_PHASE_INTERVAL, long_arm_phase_interval: float = FULL_PHASE_INTERVAL):
+    def set_phases(self, short_arm_phase:  float|None = None, long_arm_phase:  float|None = None, 
+                short_arm_phase_interval: float|None = None, long_arm_phase_interval: float|None = None):
         """AsymmetricMachZehnderInterferometer set phases method"""
-        self._short_arm_phase_sample.set(short_arm_phase, phase_interval= short_arm_phase_interval)
-        self._long_arm_phase_sample.set(long_arm_phase, phase_interval= long_arm_phase_interval)
+        if(short_arm_phase):
+            self._short_arm_phase_sample.set(short_arm_phase, 
+                                        phase_interval= short_arm_phase_interval)
+        if(long_arm_phase):
+            self._long_arm_phase_sample.set(long_arm_phase, 
+                                        phase_interval= long_arm_phase_interval)
 
     def simulate(self, electric_field: complexfloating):
         """AsymmetricMachZehnderInterferometer simulate method"""
@@ -118,14 +120,12 @@ class AsymmetricMachZehnderInterferometer(Component):
 
         # long arm
         E_long = self._long_arm_phase_sample.simulate(E_long)
-        E_long = self._mirror.simulate(E_long)
 
         # Handle buffer
         self._field_buffer.append(E_long)
         E_long = self._field_buffer.pop(0) if len(self._field_buffer) > self._buffer_size else EMPTY_FIELD
 
         # short arm
-        E_short = self._mirror.simulate(E_short)
         E_short = self._short_arm_phase_sample.simulate(E_short)
 
         # Recombine

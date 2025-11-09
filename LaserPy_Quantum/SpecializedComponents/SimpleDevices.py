@@ -1,9 +1,12 @@
-import numpy as np
+from numpy import (
+    complexfloating,
+    mod, exp, sqrt,
+    pi
+)
 
 from ..Components.Component import Component
 
 from ..Constants import EMPTY_FIELD
-from ..Constants import FULL_PHASE_INTERVAL
 
 class PhaseSample(Component):
     """
@@ -12,14 +15,14 @@ class PhaseSample(Component):
     def __init__(self, phase_delay: float = 0.0, name: str = "default_phase_sample"):
         super().__init__(name)
 
-        self._phase_interval = FULL_PHASE_INTERVAL
+        self._phase_interval = 2 * pi
         """phase interval for PhaseSample"""
 
-        phase_delay = np.mod(phase_delay, self._phase_interval)
-        self._phase_change = np.exp(1j * phase_delay)
+        phase_delay = mod(phase_delay, self._phase_interval)
+        self._phase_change = exp(1j * phase_delay)
         """phase change for PhaseSample"""
 
-        self._electric_field: np.complexfloating = EMPTY_FIELD
+        self._electric_field: complexfloating = EMPTY_FIELD
         """electric_field data for PhaseSample"""
 
     def set(self, phase_delay: float, phase_interval: float|None= None):
@@ -27,10 +30,10 @@ class PhaseSample(Component):
         #return super().set()
         if(phase_interval):
             self._phase_interval = phase_interval
-        phase_delay = np.mod(phase_delay, self._phase_interval)
-        self._phase_change = np.exp(1j * phase_delay)
+        phase_delay = mod(phase_delay, self._phase_interval)
+        self._phase_change = exp(1j * phase_delay)
 
-    def simulate(self, electric_field: np.complexfloating):
+    def simulate(self, electric_field: complexfloating):
         """PhaseSample simulate method"""
         #return super().simulate(args)
 
@@ -55,7 +58,7 @@ class Mirror(PhaseSample):
     Mirror class
     """
     def __init__(self, name: str = "default_mirror"):
-        super().__init__(np.pi, name)
+        super().__init__(pi, name)
 
     def set(self):
         """Mirror set method"""
@@ -70,20 +73,20 @@ class BeamSplitter(Component):
         super().__init__(name)
 
         # Field coefficients
-        self._t = np.sqrt(splitting_ratio_t)
-        self._r = np.exp(0.5j * np.pi) * np.sqrt(1 - splitting_ratio_t)
+        self._t = sqrt(splitting_ratio_t)
+        self._r = exp(0.5j * pi) * sqrt(1 - splitting_ratio_t)
 
         # Field variables
-        self._E_transmitted: np.complexfloating = EMPTY_FIELD
-        self._E_reflected: np.complexfloating = EMPTY_FIELD
+        self._E_transmitted: complexfloating = EMPTY_FIELD
+        self._E_reflected: complexfloating = EMPTY_FIELD
 
     def set(self, splitting_ratio_t: float):
         """BeamSplitter reset method"""
         #return super().set()
-        self._t = np.sqrt(splitting_ratio_t)
-        self._r = np.exp(0.5j * np.pi) * np.sqrt(1 - splitting_ratio_t)
+        self._t = sqrt(splitting_ratio_t)
+        self._r = exp(0.5j * pi) * sqrt(1 - splitting_ratio_t)
 
-    def simulate(self, electric_field: np.complexfloating, electric_field_port2: np.complexfloating = EMPTY_FIELD):
+    def simulate(self, electric_field: complexfloating, electric_field_port2: complexfloating = EMPTY_FIELD):
         """BeamSplitter simulate method"""
         #return super().simulate(args)
         self._E_transmitted = self._t * electric_field + self._r * electric_field_port2

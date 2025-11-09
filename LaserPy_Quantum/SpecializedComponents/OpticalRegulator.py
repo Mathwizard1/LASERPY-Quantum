@@ -1,4 +1,6 @@
-from numpy import complexfloating
+from numpy import (
+    complexfloating
+)
 
 from LaserPy_Quantum.Components.Component import Clock
 
