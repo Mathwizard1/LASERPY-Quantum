@@ -13,7 +13,7 @@
 
 ### 📦 Installation
 
-- LaserPy_Quantum is now on *PyPI*.
+- LaserPy_Quantum is now on *[pypi](https://pypi.org/project/LaserPy-Quantum/)*.
 ```bash
 pip install LaserPy-Quantum
 ```
@@ -76,8 +76,8 @@ It allows researchers and engineers to prototype and test theoretical setups bef
 1) Rust based critical parts off-loading
 2) Component behaviour refinement
 3) More components
+> - TODO Optical Circulator
 > - TODO multiport interferometer
-> - TODO PhotonDetector behaviour refinement
 4) GUI
 
 ### 🤝 Contributing

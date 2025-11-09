@@ -66,7 +66,6 @@ LaserPyConstants.load_from_json()
 ERR_TOLERANCE = 1.0e-12
 
 EMPTY_FIELD: complexfloating = ERR_TOLERANCE * exp(1j * 0)
-FULL_PHASE_INTERVAL: float = 2 * pi
 
 FIG_WIDTH = 12
 FIG_HEIGHT = 6

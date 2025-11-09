@@ -246,7 +246,7 @@ class DataComponent(Component):
         # Handle cases
         val = self._handle_get_data()
         
-        data_dict = {}
+        data_dict: dict[str, np.ndarray] = {}
         for key in self._simulation_data:
             data_dict[key] = np.zeros(1) if(val) else np.array(self._simulation_data[key])
         return data_dict
