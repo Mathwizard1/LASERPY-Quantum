@@ -50,6 +50,6 @@ __all__ = [
     "get_time_delay_phase_correction"
 ]
 
-__version__ = '0.0.7'
+__version__ = '0.0.8'
 __author__ = 'Anshurup Gupta'
 __description__ = 'A high-level, open-source Python library designed for the theoretical simulation of laser systems'
