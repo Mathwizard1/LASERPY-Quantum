@@ -31,7 +31,7 @@ class VariableOpticalAttenuator(Component):
         #return super().set()
         self._attenuation_dB = attenuation_dB
 
-    def siulate(self, electric_field: complexfloating):
+    def simulate(self, electric_field: complexfloating):
         """VariableOpticalAttenuator simulate method"""
         #return super().simulate(args)
         # Calculate attenuation factor on electric field amplitude

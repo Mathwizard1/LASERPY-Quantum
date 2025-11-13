@@ -24,8 +24,6 @@ t_unit = 1e-9
 t_final = t_unit * len(modulation_bits) / 2
 sampling_rate = 2
 
-RESET_MODE = True
-
 # Current Constants
 I_th = 0.0178
 MASTER_BASE_DC = 1.4 * I_th
@@ -104,13 +102,10 @@ time_data = simulator.get_data()
 
 #display_class_instances_data((master_laser, slave_laser), time_data)
 
-#exit(code= 0)
 ############################################################################
-if(RESET_MODE):
-    simulator.reset_data()
-else:
-    t_final = 2 * t_final
-    simulator_clock.set(t_final)
+
+t_final = 2 * t_final
+simulator_clock.set(t_final)
 
 slave_laser.set_slave_Laser()
 
@@ -129,18 +124,13 @@ time_data = simulator.get_data()
 #display_laser_field(master_laser)
 #display_laser_field(slave_laser)
 
-#exit(code= 0)
 ############################################################################
 
 modulation_bits = [0,0] + [1,0,1,0,1,1,1,0,0,1]
 
-if(RESET_MODE):
-    simulator.reset_data()
-    t_final = t_unit * (len(modulation_bits) - 1)
-    simulator_clock.set(t_final)
-else:
-    t_final += t_unit * (len(modulation_bits) - 1)
-    simulator_clock.set(t_final)
+simulator.reset_data()
+t_final = t_unit * (len(modulation_bits) - 1)
+simulator_clock.set(t_final)
 
 current_driver1.set(mBase, (mBase, mModulation), mod_func)
 

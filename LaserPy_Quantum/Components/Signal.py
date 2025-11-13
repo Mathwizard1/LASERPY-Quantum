@@ -140,7 +140,7 @@ class ArbitaryWaveGenerator:
         self._SINGLETON = True
 
         self.name = name
-        self.signals = {}
+        self.signals:dict[str, ArbitaryWave] = {}
         """Signals dictionary for ArbitaryWaves"""
 
     def set(self, arbitarywaves:ArbitaryWave|tuple[ArbitaryWave,...]):
